@@ -6,6 +6,8 @@ const pool = require('./db'); // Importa la configuración de la base de datos
 const { auth } = require('express-openid-connect');
 const { requiresAuth } = require('express-openid-connect');
 
+const port = process.env.PORT;
+
 
 // Importa las rutas
 const deporteRoutes = require('./routes/deporte');
@@ -47,6 +49,6 @@ app.get('/profile', requiresAuth(), (req, res) => {
   res.send(JSON.stringify(req.oidc.user));
 });
 
-app.listen(5000, () => {
-    console.log("el servidor inicio en el puerto 5000");
+app.listen(port, () => {
+    console.log(`el servidor inicio en el puerto:${port}`);
   });
