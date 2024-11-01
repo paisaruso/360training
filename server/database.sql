@@ -44,5 +44,39 @@ CREATE TABLE Entrenador_Deportista (
     fecha_finalizacion TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS Rutina (
+    id_rutina SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    fecha_creacion DATE DEFAULT CURRENT_DATE,
+    duracion INTEGER,  -- Duración en minutos
+    frecuencia_semanal INTEGER,  -- Número de días por semana
+    objetivo VARCHAR(50)  -- Ejemplo: 'fuerza', 'resistencia', 'flexibilidad'
+);
+
+
 -- Crear índice para la relación Entrenador-Deportista
 CREATE INDEX idx_entrenador_deportista ON Entrenador_Deportista(id_entrenador, id_deportista);
+
+CREATE TABLE Ejercicios (
+    id_ejercicio SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    grupo_muscular VARCHAR(50),
+    volumen INTEGER,
+    promedio_flecha FLOAT,
+    puntaje_eval INTEGER,
+    tiempo_descanso INTEGER,
+    incluye_flechas BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE Asignacion_Ejercicios_Rutinas (
+    id_asignacion SERIAL PRIMARY KEY,
+    id_rutina INTEGER NOT NULL,
+    id_ejercicio INTEGER NOT NULL,
+    orden INTEGER,
+    dia_semana VARCHAR(20),
+    FOREIGN KEY (id_rutina) REFERENCES Rutina(id_rutina),
+    FOREIGN KEY (id_ejercicio) REFERENCES Ejercicios(id_ejercicio)
+);
+
