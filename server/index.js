@@ -14,6 +14,9 @@ const deporteRoutes = require('./routes/deporte');
 const usuarioRoutes = require('./routes/usuario');
 const deportistaRoutes = require('./routes/deportista');
 const entrenadorRoutes = require('./routes/entrenador');
+const rutinaRoutes = require('./routes/rutina');
+const ejercicioRoutes = require('./routes/ejercicio');
+const asignacionEjercicioRoutes = require('./routes/asignacionEjercicio');
 
 
 
@@ -27,6 +30,9 @@ app.use('/api/deportes', deporteRoutes);
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/deportistas', deportistaRoutes);
 app.use('/api/entrenadores', entrenadorRoutes);
+app.use('/api/rutina', rutinaRoutes);
+app.use('/api/ejercicio', ejercicioRoutes);
+app.use('/api/asignacion_ejercicio', asignacionEjercicioRoutes);
 
 const config = {
   authRequired: false,
