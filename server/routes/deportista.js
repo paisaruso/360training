@@ -16,6 +16,8 @@ router.get('/', async (req, res) => {
 // Crear un nuevo deportista
 router.post('/', async (req, res) => {
   const { id_usuario, fecha_nacimiento, sexo, peso, altura, nivel_experiencia, id_deporte } = req.body;
+
+  //console.log("Datos recibidos para crear deportista:", req.body); // Verificar datos
   try {
     const result = await pool.query(
       'INSERT INTO Deportistas (id_usuario, fecha_nacimiento, sexo, peso, altura, nivel_experiencia, id_deporte) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
