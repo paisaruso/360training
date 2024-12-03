@@ -31,3 +31,19 @@ body {
     text-wrap: balance;
   }
 }
+
+/* Ejemplo de estilo en CSS */
+.btn-logout {
+  background-color: #ff4d4d;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px;
+}
+
+.btn-logout:hover {
+  background-color: #ff1a1a;
+}
+

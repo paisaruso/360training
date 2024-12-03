@@ -85,6 +85,24 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// Leer un usuario por email
+router.get("/:email", async (req, res) => {
+  const { email } = req.params;
+  try {
+    const result = await pool.query(
+      "SELECT * FROM Usuarios WHERE correo_electronico = $1",
+      [email]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).send("Correo de usuario no encontrado");
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Error en el servidor");
+  }
+});
+
 // Eliminar un usuario
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
