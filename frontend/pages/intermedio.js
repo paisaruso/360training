@@ -6,15 +6,15 @@ export default function Intermedio() {
   const { email } = router.query;
 
   useEffect(() => {
-    if (!email) {
-      router.push('/'); // Si no hay correo, redirige al inicio
-      return;
-    }
+    //if (!email) {
+      //router.push('/'); // Si no hay correo, redirige al inicio
+      //return;
+    //}
 
     // Mostrar el mensaje y redirigir después de unos segundos
     setTimeout(() => {
       router.push(`/registro?email=${email}`);
-    }, 3000); // Redirigir después de 3 segundos
+    }, 5000); // Redirigir después de 5 segundos
   }, [email, router]);
 
   return (
@@ -33,3 +33,4 @@ export default function Intermedio() {
     </div>
   );
 }
+
