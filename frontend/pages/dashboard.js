@@ -1,25 +1,35 @@
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
 
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [email, setEmail] = useState('');
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const emailFromQuery = queryParams.get('email');
+    if (emailFromQuery) {
+      setEmail(emailFromQuery);
+    }
+  }, []); // Solo se ejecuta en el cliente
+
   const fetchUserData = async () => {
     try {
       //const email = localStorage.getItem('email'); // Obtén el email del usuario almacenado
-      const response = await fetch(`http://localhost:5000/api/user-info`, {
-        credentials: 'include',
+      const response = await fetch(`https://three60training-jp4i.onrender.com/api/user-info?email=${email}`, {
+        credentials: "include",
       });
       const data = await response.json();
 
       if (response.ok) {
         setUserData(data); // Guardar los datos del usuario
       } else {
-        console.error('Error obteniendo datos del usuario:', data.error);
+        console.error("Error obteniendo datos del usuario:", data.error);
       }
     } catch (error) {
-      console.error('Error en la solicitud:', error);
+      console.error("Error en la solicitud:", error);
     } finally {
       setLoading(false);
     }
@@ -28,6 +38,11 @@ const Dashboard = () => {
   useEffect(() => {
     fetchUserData();
   }, []);
+  useEffect(() => {
+    if (email) {
+      fetchUserData();
+    }
+  }, [email]); // Cuando el email cambie, ejecuta la solicitud
 
   if (loading) return <p>Cargando datos del usuario...</p>;
 
@@ -37,8 +52,10 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-bold text-green-500 mb-4">Bienvenido al Dashboard</h1>
-      <Link href="http://localhost:5000/salir">
+      <h1 className="text-2xl font-bold text-green-500 mb-4">
+        Bienvenido al Dashboard
+      </h1>
+      <Link href="https://three60training-jp4i.onrender.com/salir">
         <button className="w-full p-4 bg-green-600 text-white font-bold rounded-md hover:bg-green-700 mb-6">
           Fin de Sesión
         </button>
@@ -56,14 +73,18 @@ const Dashboard = () => {
           <strong>Tipo de Usuario:</strong> {user.tipo_usuario}
         </p>
         <p>
-          <strong>Fecha de Registro:</strong> {new Date(user.fecha_registro).toLocaleString()}
+          <strong>Fecha de Registro:</strong>{" "}
+          {new Date(user.fecha_registro).toLocaleString()}
         </p>
 
-        {user.tipo_usuario === 'Deportista' && additionalInfo && (
+        {user.tipo_usuario === "Deportista" && additionalInfo && (
           <>
-            <h3 className="text-lg font-semibold mt-4">Información de Deportista</h3>
+            <h3 className="text-lg font-semibold mt-4">
+              Información de Deportista
+            </h3>
             <p>
-              <strong>Fecha de Nacimiento:</strong> {additionalInfo.fecha_nacimiento}
+              <strong>Fecha de Nacimiento:</strong>{" "}
+              {additionalInfo.fecha_nacimiento}
             </p>
             <p>
               <strong>Sexo:</strong> {additionalInfo.sexo}
@@ -75,7 +96,8 @@ const Dashboard = () => {
               <strong>Altura:</strong> {additionalInfo.altura} m
             </p>
             <p>
-              <strong>Nivel de Experiencia:</strong> {additionalInfo.nivel_experiencia}
+              <strong>Nivel de Experiencia:</strong>{" "}
+              {additionalInfo.nivel_experiencia}
             </p>
             <p>
               <strong>Deporte:</strong> {additionalInfo.id_deporte}
@@ -83,9 +105,11 @@ const Dashboard = () => {
           </>
         )}
 
-        {user.tipo_usuario === 'Entrenador' && additionalInfo && (
+        {user.tipo_usuario === "Entrenador" && additionalInfo && (
           <>
-            <h3 className="text-lg font-semibold mt-4">Información de Entrenador</h3>
+            <h3 className="text-lg font-semibold mt-4">
+              Información de Entrenador
+            </h3>
             <p>
               <strong>Especialidad:</strong> {additionalInfo.especialidad}
             </p>

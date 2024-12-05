@@ -6,6 +6,7 @@ const pool = require("./db"); // Importa la configuración de la base de datos
 const { auth } = require("express-openid-connect");
 const { requiresAuth } = require("express-openid-connect");
 const session = require("express-session"); // Middleware para manejo de sesiones
+const pgSession = require('connect-pg-simple')(session);
 const cookieParser = require('cookie-parser');
 
 const port = process.env.PORT;
@@ -31,12 +32,21 @@ app.use(
 app.use(cookieParser());
 app.use(
   session({
-    secret: process.env.AUTH0_SECRET, // Cambia esto por una clave segura
+    store: new pgSession({
+      pool, // Usa la conexión existente
+    }),
+    secret: process.env.AUTH0_SECRET || "supersecret", // Cambia esto por una clave segura
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }, // Cambiar a true en producción con HTTPS
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24, // 1 día
+      httpOnly: true, // Aumenta la seguridad al no permitir acceso desde JavaScript
+      secure: process.env.NODE_ENV === "production", // Solo con HTTPS en producción
+      sameSite: "none", // Asegura que las cookies se envíen entre dominios
+    },
   })
 );
+
 app.use(express.json()); //req.body
 
 
@@ -151,7 +161,7 @@ app.get("/dashboard-redirect", (req, res) => {
   console.log("Correo guardado en sesión:", req.session.userEmail);
 
   // Redirigir al dashboard del frontend
-  res.redirect("http://localhost:3000/dashboard");
+  res.redirect(`http://localhost:3000/dashboard?email=${req.session.userEmail}`);
 });
 
 
@@ -159,16 +169,16 @@ app.get("/dashboard-redirect", (req, res) => {
 //obtener data del usuario
 // Endpoint para obtener datos del usuario
 app.get("/api/user-info", async (req, res) => {
-  //const { email } = req.query; // Suponiendo que identificamos al usuario por su correo electrónico
+  const { email } = req.query; // Suponiendo que identificamos al usuario por su correo electrónico
   //const email = req.session.userEmail;
-  let email='';
-  console.log('sesion',req.session.userEmail);
-  console.log('cookies',req.cookies);
-  if(req.session.userEmail){
-    email =req.session.userEmail;
-  }else{
-    email = 'cuarto';
-  }
+  //let email='';
+  // console.log('sesion',req.session.userEmail);
+  // console.log('cookies',req.cookies);
+  // if(req.session.userEmail){
+  //   email =req.session.userEmail;
+  // }else{
+  //   email = 'cuarto';
+  // }
   
 
   if (!email) {
