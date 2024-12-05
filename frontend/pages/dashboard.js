@@ -17,7 +17,6 @@ const Dashboard = () => {
 
   const fetchUserData = async () => {
     try {
-      //const email = localStorage.getItem('email'); // Obtén el email del usuario almacenado
       const response = await fetch(`https://three60training-jp4i.onrender.com/api/user-info?email=${email}`, {
         credentials: "include",
       });

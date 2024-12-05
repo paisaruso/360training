@@ -11,14 +11,7 @@ const cookieParser = require('cookie-parser');
 
 const port = process.env.PORT;
 
-// Importa las rutas
-const deporteRoutes = require("./routes/deporte");
-const usuarioRoutes = require("./routes/usuario");
-const deportistaRoutes = require("./routes/deportista");
-const entrenadorRoutes = require("./routes/entrenador");
-const rutinaRoutes = require("./routes/rutina");
-const ejercicioRoutes = require("./routes/ejercicio");
-const asignacionEjercicioRoutes = require("./routes/asignacionEjercicio");
+
 
 //middleware
 // Configuración del middleware CORS
@@ -34,8 +27,9 @@ app.use(
   session({
     store: new pgSession({
       pool, // Usa la conexión existente
+      tableName: 'session',
     }),
-    secret: process.env.AUTH0_SECRET || "supersecret", // Cambia esto por una clave segura
+    secret: process.env.AUTH0_SECRET || "supersecret", // Clave Secreta
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -50,14 +44,6 @@ app.use(
 app.use(express.json()); //req.body
 
 
-// Usa las rutas
-app.use("/api/deportes", deporteRoutes);
-app.use("/api/usuarios", usuarioRoutes);
-app.use("/api/deportistas", deportistaRoutes);
-app.use("/api/entrenadores", entrenadorRoutes);
-app.use("/api/rutina", rutinaRoutes);
-app.use("/api/ejercicio", ejercicioRoutes);
-app.use("/api/asignacion_ejercicio", asignacionEjercicioRoutes);
 
 const config = {
   authRequired: false,
@@ -81,13 +67,6 @@ app.get("/callback", (req, res) => {
   }
 });
 
-// Ruta de logout
-// app.get('/logout', (req, res) => {
-//   console.log("se deslogueo");
-//   const returnTo = `${process.env.FRONTEND_URL}`;
-//   res.oidc.logout({ returnTo }); // Esto redirige al frontend después de cerrar sesión
-// });
-// req.isAuthenticated is provided from the auth router
 app.get("/", (req, res) => {
   res.send(req.oidc.isAuthenticated() ? "Logged sup in" : "Logged out");
 });
@@ -100,12 +79,12 @@ app.get("/logout", (req, res) => {
 
 app.get("/salir", (req, res) => {
   // Limpia las cookies relacionadas con la sesión de Auth0
-  res.clearCookie("appSession"); // Reemplaza 'appSession' con el nombre correcto de tu cookie, si lo sabes
+  res.clearCookie("appSession"); 
   res.clearCookie("auth_verification");
   res.clearCookie("_auth_verification");
   res.clearCookie("auth0.is.authenticated"); // Cookie específica de Auth0, si existe
 
-  // Opcional: borra cualquier otro dato de sesión si usas una estrategia como sesiones de Express
+  // borra cualquier otro dato de sesión como sesiones de Express
   if (req.session) {
     req.session.destroy((err) => {
       if (err) {
@@ -127,15 +106,11 @@ app.post("/api/check-user", async (req, res) => {
   req.session.userEmail = email;
 
   try {
-    // Realizas la consulta directamente aquí, como en tu API de usuario
+    // Realizas la consulta de API de usuario
     const result = await pool.query(
       "SELECT id_usuario FROM Usuarios WHERE correo_electronico = $1",
       [email]
     );
-
-    // Almacenar el correo en la sesión
-    //req.session.userEmail = email;
-    //console.log('EL correo registrado en la sesion fue',req.session.userEmail);
 
     if (result.rows.length === 0) {
       console.log("Usuario sin email", email);
@@ -169,20 +144,11 @@ app.get("/dashboard-redirect", (req, res) => {
 //obtener data del usuario
 // Endpoint para obtener datos del usuario
 app.get("/api/user-info", async (req, res) => {
-  const { email } = req.query; // Suponiendo que identificamos al usuario por su correo electrónico
-  //const email = req.session.userEmail;
-  //let email='';
-  // console.log('sesion',req.session.userEmail);
-  // console.log('cookies',req.cookies);
-  // if(req.session.userEmail){
-  //   email =req.session.userEmail;
-  // }else{
-  //   email = 'cuarto';
-  // }
-  
+  const { email } = req.query; // identificamos al usuario por su correo electrónico
+
 
   if (!email) {
-    console.log("No email");
+    //console.log("No email");
     return res.status(401).json({ error: "No hay usuario autenticado" });
   }
 
@@ -222,6 +188,24 @@ app.get("/api/user-info", async (req, res) => {
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });
+
+// Importa las rutas
+const deporteRoutes = require("./routes/deporte");
+const usuarioRoutes = require("./routes/usuario");
+const deportistaRoutes = require("./routes/deportista");
+const entrenadorRoutes = require("./routes/entrenador");
+const rutinaRoutes = require("./routes/rutina");
+const ejercicioRoutes = require("./routes/ejercicio");
+const asignacionEjercicioRoutes = require("./routes/asignacionEjercicio");
+
+// Usa las rutas
+app.use("/api/deportes", deporteRoutes);
+app.use("/api/usuarios", usuarioRoutes);
+app.use("/api/deportistas", deportistaRoutes);
+app.use("/api/entrenadores", entrenadorRoutes);
+app.use("/api/rutina", rutinaRoutes);
+app.use("/api/ejercicio", ejercicioRoutes);
+app.use("/api/asignacion_ejercicio", asignacionEjercicioRoutes);
 
 app.listen(port, () => {
   console.log(`el servidor inicio en el puerto:${port}`);
