@@ -7,6 +7,7 @@ export default function Registro() {
     correo_electronico: "",
     contrasena: "",
     tipo_usuario: "Deportista",
+    club:"",
     fecha_nacimiento: "",
     sexo: "",
     peso: "",
@@ -52,6 +53,7 @@ export default function Registro() {
           correo_electronico: formData.correo_electronico,
           contrasena: formData.contrasena,
           tipo_usuario: formData.tipo_usuario,
+          club:formData.club,
         }),
       });
 
@@ -133,6 +135,20 @@ export default function Registro() {
               type="password"
               name="contrasena"
               value={formData.contrasena}
+              onChange={handleChange}
+              required
+              className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Club
+            </label>
+            <input
+              type="text"
+              name="club"
+              value={formData.club}
               onChange={handleChange}
               required
               className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"

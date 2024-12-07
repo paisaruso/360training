@@ -33,50 +33,99 @@ CREATE TABLE Entrenadores (
     especialidad VARCHAR(100)
 );
 
-
-
--- Tabla Entrenador_Deportista
-CREATE TABLE Entrenador_Deportista (
-    id SERIAL PRIMARY KEY,
-    id_entrenador INT REFERENCES Entrenadores(id_entrenador) ON DELETE CASCADE,
-    id_deportista INT REFERENCES Deportistas(id_deportista) ON DELETE CASCADE,
-    fecha_asignacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    fecha_finalizacion TIMESTAMP
+CREATE TABLE "usuario_deporte" (
+  "id_usuario" integer NOT NULL,
+  "id_deporte" integer NOT NULL,
+   PRIMARY KEY(id_usuario,id_deporte)
 );
 
-CREATE TABLE IF NOT EXISTS Rutina (
-    id_rutina SERIAL PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    descripcion TEXT,
-    fecha_creacion DATE DEFAULT CURRENT_DATE,
-    duracion INTEGER,  -- Duración en minutos
-    frecuencia_semanal INTEGER,  -- Número de días por semana
-    objetivo VARCHAR(50)  -- Ejemplo: 'fuerza', 'resistencia', 'flexibilidad'
+CREATE TABLE "rutina_especifica" (
+  "id_rutina" integer PRIMARY KEY,
+  "id_deportista" integer NOT NULL,
+  "id_deporte" integer NOT NULL,
+  "fecha" date,
+  "comentario_deportista" text,
+  "comentario_entrenador" text
 );
 
-
--- Crear índice para la relación Entrenador-Deportista
-CREATE INDEX idx_entrenador_deportista ON Entrenador_Deportista(id_entrenador, id_deportista);
-
-CREATE TABLE Ejercicios (
-    id_ejercicio SERIAL PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    descripcion TEXT,
-    grupo_muscular VARCHAR(50),
-    volumen INTEGER,
-    promedio_flecha FLOAT,
-    puntaje_eval INTEGER,
-    tiempo_descanso INTEGER,
-    incluye_flechas BOOLEAN DEFAULT FALSE
+CREATE TABLE "rutina_fisica" (
+  "id_rutina" integer PRIMARY KEY,
+  "id_deportista" integer NOT NULL,
+  "fecha" date,
+  "comentario_deportista" text,
+  "comentario_entrenador" text
 );
 
-CREATE TABLE Asignacion_Ejercicios_Rutinas (
-    id_asignacion SERIAL PRIMARY KEY,
-    id_rutina INTEGER NOT NULL,
-    id_ejercicio INTEGER NOT NULL,
-    orden INTEGER,
-    dia_semana VARCHAR(20),
-    FOREIGN KEY (id_rutina) REFERENCES Rutina(id_rutina),
-    FOREIGN KEY (id_ejercicio) REFERENCES Ejercicios(id_ejercicio)
+CREATE TABLE "ejercicio_disparo" (
+  "id_ejercicio" integer PRIMARY KEY,
+  "id_rutina_especifica" integer NOT NULL,
+  "cantidad_flechas" integer,
+  "flechas_por_serie" integer,
+  "promedio_por_flecha" integer,
+  "tamano_diana" integer,
+  "distancia" integer,
+  "evaluacion" bool
 );
 
+CREATE TABLE "ejercicio_fisico" (
+  "id_ejercicio_fisico" integer PRIMARY KEY,
+  "id_rutina_fisica" integer NOT NULL,
+  "id_creado_por" integer NOT NULL,
+  "tipo" varchar,
+  "tiempo" integer,
+  "repeticiones" integer,
+  "series" integer,
+  "peso" integer
+);
+
+CREATE TABLE "comentarios" (
+  "id_comentario" integer PRIMARY KEY,
+  "id_entrenador" integer NOT NULL,
+  "id_deportista" integer NOT NULL,
+  "contenido" text,
+  "fecha" timestamp
+);
+
+ALTER TABLE "deportistas" ADD COLUMN "id_entrenador" integer;
+
+ALTER TABLE "deportistas" ADD FOREIGN KEY ("id_entrenador") REFERENCES "entrenadores" ("id_entrenador");
+
+ALTER TABLE "usuario_deporte" ADD FOREIGN KEY ("id_usuario") REFERENCES "usuarios" ("id_usuario");
+
+ALTER TABLE "usuario_deporte" ADD FOREIGN KEY ("id_deporte") REFERENCES "deporte" ("id_deporte");
+
+ALTER TABLE "rutina_especifica" ADD FOREIGN KEY ("id_deporte") REFERENCES "deporte" ("id_deporte");
+
+ALTER TABLE "rutina_especifica" ADD FOREIGN KEY ("id_deportista") REFERENCES "deportistas" ("id_deportista");
+
+ALTER TABLE "rutina_fisica" ADD FOREIGN KEY ("id_deportista") REFERENCES "deportistas" ("id_deportista");
+
+ALTER TABLE "ejercicio_fisico" ADD FOREIGN KEY ("id_creado_por") REFERENCES "entrenadores" ("id_entrenador");
+
+ALTER TABLE "ejercicio_fisico" ADD FOREIGN KEY ("id_rutina_fisica") REFERENCES "rutina_fisica" ("id_rutina");
+
+ALTER TABLE "ejercicio_disparo" ADD FOREIGN KEY ("id_rutina_especifica") REFERENCES "rutina_especifica" ("id_rutina");
+
+ALTER TABLE "comentarios" ADD FOREIGN KEY ("id_entrenador") REFERENCES "entrenadores" ("id_entrenador");
+
+ALTER TABLE "comentarios" ADD FOREIGN KEY ("id_deportista") REFERENCES "deportistas" ("id_deportista");
+
+ALTER TABLE "entrenadores" ADD FOREIGN KEY ("id_usuario") REFERENCES "usuarios" ("id_usuario");
+
+ALTER TABLE "deportistas" ADD FOREIGN KEY ("id_usuario") REFERENCES "usuarios" ("id_usuario");
+
+ALTER TABLE rutina_fisica ALTER COLUMN id_rutina DROP DEFAULT;
+ALTER TABLE rutina_fisica ALTER COLUMN id_rutina ADD GENERATED ALWAYS AS IDENTITY;
+
+ALTER TABLE ejercicio_disparo ALTER COLUMN id_ejercicio DROP DEFAULT;
+ALTER TABLE ejercicio_disparo ALTER COLUMN id_ejercicio ADD GENERATED ALWAYS AS IDENTITY;
+
+ALTER TABLE ejercicio_fisico ALTER COLUMN id_ejercicio_fisico DROP DEFAULT;
+ALTER TABLE ejercicio_fisico ALTER COLUMN id_ejercicio_fisico ADD GENERATED ALWAYS AS IDENTITY;
+
+ALTER TABLE comentarios ALTER COLUMN id_comentario DROP DEFAULT;
+ALTER TABLE comentarios ALTER COLUMN id_comentario ADD GENERATED ALWAYS AS IDENTITY;
+
+ALTER TABLE rutina_especifica ALTER COLUMN fecha SET DEFAULT CURRENT_DATE;
+ALTER TABLE rutina_fisica ALTER COLUMN fecha SET DEFAULT CURRENT_DATE;
+ALTER TABLE comentarios ALTER COLUMN fecha SET DEFAULT CURRENT_DATE;
