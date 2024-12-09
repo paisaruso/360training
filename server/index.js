@@ -136,7 +136,7 @@ app.get("/dashboard-redirect", (req, res) => {
   console.log("Correo guardado en sesión:", req.session.userEmail);
 
   // Redirigir al dashboard del frontend
-  res.redirect(`http://localhost:3000/dashboard?email=${req.session.userEmail}`);
+  res.redirect(`http://localhost:3000/dashboard?sid=${req.session.id}`);
 });
 
 
@@ -188,6 +188,34 @@ app.get("/api/user-info", async (req, res) => {
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });
+
+// Función para obtener datos de sesión desde la base de datos
+const getSessionData = async (sid) => {
+  const result = await pool.query("SELECT sess FROM session WHERE sid = $1", [sid]);
+  return result.rows[0]?.sess || null; // Retorna el JSON almacenado en el campo `sess`
+};
+
+// Endpoint para obtener datos de sesión
+app.get("/api/user-session", async (req, res) => {
+  const sid = req.query.sid; // Obtenemos el SID del query string
+  if (!sid) {
+    return res.status(400).json({ error: "Session ID no proporcionado" });
+  }
+
+  try {
+    const sessionData = await getSessionData(sid);
+    if (!sessionData || !sessionData.userEmail) {
+      return res.status(401).json({ error: "Sesión no válida o expirada" });
+    }
+
+    res.json({ email: sessionData.userEmail }); // Retorna el correo almacenado en la sesión
+  } catch (error) {
+    console.error("Error obteniendo datos de sesión:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+
 
 // Importa las rutas
 const deporteRoutes = require("./routes/deporte");
