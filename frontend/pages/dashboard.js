@@ -1,27 +1,49 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 const Dashboard = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [sid, setSid] = useState("");
 
-  const [email, setEmail] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
-    const emailFromQuery = queryParams.get('email');
-    if (emailFromQuery) {
-      setEmail(emailFromQuery);
+    const sidFromQuery = queryParams.get("sid");
+    if (sidFromQuery) {
+      setSid(sidFromQuery);
+      localStorage.setItem("sid", sidFromQuery); // Guardar el SID en almacenamiento local
     }
-  }, []); // Solo se ejecuta en el cliente
+  }, []);
 
-  const fetchUserData = async () => {
+  const fetchUserEmail = async (sid) => {
     try {
-      const response = await fetch(`https://three60training-jp4i.onrender.com/api/user-info?email=${email}`, {
-        credentials: "include",
-      });
+      const response = await fetch(
+        `https://three60training-jp4i.onrender.com/api/user-session?sid=${sid}`,
+        { credentials: "include" }
+      );
       const data = await response.json();
+      if (response.ok) {
+        return data.email; // Retorna el correo electrónico del usuario
+      } else {
+        console.error("Error obteniendo email:", data.error);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error en la solicitud:", error);
+      return null;
+    }
+  };
 
+  const fetchUserData = async (email) => {
+    try {
+      const response = await fetch(
+        `https://three60training-jp4i.onrender.com/api/user-info?email=${email}`,
+        { credentials: "include" }
+      );
+      const data = await response.json();
       if (response.ok) {
         setUserData(data); // Guardar los datos del usuario
       } else {
@@ -35,19 +57,26 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    fetchUserData();
-  }, []);
-  useEffect(() => {
-    if (email) {
-      fetchUserData();
+    const storedSid = localStorage.getItem("sid");
+    const currentSid = sid || storedSid;
+    if (currentSid) {
+      fetchUserEmail(currentSid).then((email) => {
+        if (email) fetchUserData(email);
+      });
+    } else {
+      setLoading(false);
     }
-  }, [email]); // Cuando el email cambie, ejecuta la solicitud
+  }, [sid]);
 
   if (loading) return <p>Cargando datos del usuario...</p>;
 
   if (!userData) return <p>No se pudieron cargar los datos del usuario.</p>;
 
   const { user, additionalInfo } = userData;
+
+  const navigateToProfile = () => {
+    router.push("/user_profile");
+  };
 
   return (
     <div className="dashboard p-6 bg-gray-100 min-h-screen">
@@ -115,6 +144,12 @@ const Dashboard = () => {
           </>
         )}
       </div>
+      <button
+        onClick={navigateToProfile}
+        className="p-4 bg-blue-600 text-white font-bold rounded-md mt-9 hover:bg-blue-700"
+      >
+        Ir a Perfil de Usuario
+      </button>
     </div>
   );
 };
