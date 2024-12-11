@@ -21,7 +21,7 @@ const Dashboard = () => {
   const fetchUserEmail = async (sid) => {
     try {
       const response = await fetch(
-        `https://three60training-jp4i.onrender.com/api/user-session?sid=${sid}`,
+        `https://three60training-jp4i.onrender.com/api/usuarios/user-session?sid=${sid}`,
         { credentials: "include" }
       );
       const data = await response.json();
@@ -40,7 +40,7 @@ const Dashboard = () => {
   const fetchUserData = async (email) => {
     try {
       const response = await fetch(
-        `https://three60training-jp4i.onrender.com/api/user-info?email=${email}`,
+        `https://three60training-jp4i.onrender.com/api/usuarios/user-info?email=${email}`,
         { credentials: "include" }
       );
       const data = await response.json();
@@ -80,14 +80,17 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-bold text-green-500 mb-4">
+      <div className="flex flex-row justify-between">
+        <h1 className="text-2xl font-bold text-green-500 mb-4">
         Bienvenido al Dashboard
       </h1>
-      <Link href="https://three60training-jp4i.onrender.com/salir">
+      <Link href="https://three60training-jp4i.onrender.com/auth/salir">
         <button className="w-full p-4 bg-green-600 text-white font-bold rounded-md hover:bg-green-700 mb-6">
           Fin de Sesión
         </button>
       </Link>
+      </div>
+      
 
       <div className="user-info p-4 bg-black rounded-lg shadow-md">
         <h2 className="text-xl font-semibold mb-4">Datos del Usuario</h2>

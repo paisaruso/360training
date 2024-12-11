@@ -26,7 +26,7 @@ export default function Registro() {
     // Obtener lista de deportes desde el backend
     const fetchDeportes = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/deportes");
+        const response = await fetch("https://three60training-jp4i.onrender.com/api/deportes");
         const data = await response.json();
         setDeportes(data);
       } catch (error) {
@@ -45,7 +45,7 @@ export default function Registro() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5000/api/usuarios", {
+      const response = await fetch("https://three60training-jp4i.onrender.com/api/usuarios", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -61,7 +61,7 @@ export default function Registro() {
       if (!response.ok) throw new Error("Error en el registro de usuario");
 
       if (formData.tipo_usuario === "Deportista") {
-        await fetch("http://localhost:5000/api/deportistas", {
+        await fetch("https://three60training-jp4i.onrender.com/api/deportistas", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -75,7 +75,7 @@ export default function Registro() {
           }),
         });
       } else if (formData.tipo_usuario === "Entrenador") {
-        await fetch("http://localhost:5000/api/entrenadores", {
+        await fetch("https://three60training-jp4i.onrender.com/api/entrenadores", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
