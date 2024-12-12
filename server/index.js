@@ -5,9 +5,9 @@ const configureSession = require("./middleware/session");
 const configureAuth = require("./config/auth");
 const usuarioRoutes = require("./routes/usuarioRoutes");
 const authRoutes = require("./routes/authRoutes");
-const deporteRoutes = require("./routes/deporte");
-const deportistaRoutes = require("./routes/deportista");
-const entrenadorRoutes = require("./routes/entrenador");
+const deporteRoutes = require("./routes/deporteRoutes");
+const deportistaRoutes = require("./routes/deportistaRoutes");
+const entrenadorRoutes = require("./routes/entrenadorRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
