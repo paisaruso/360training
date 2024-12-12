@@ -21,7 +21,7 @@ const Dashboard = () => {
   const fetchUserEmail = async (sid) => {
     try {
       const response = await fetch(
-        `https://three60training-jp4i.onrender.com/api/usuarios/user-session?sid=${sid}`,
+        `https://three60training-jp4i.onrender.com/api/user-session?sid=${sid}`,
         { credentials: "include" }
       );
       const data = await response.json();
@@ -40,7 +40,7 @@ const Dashboard = () => {
   const fetchUserData = async (email) => {
     try {
       const response = await fetch(
-        `https://three60training-jp4i.onrender.com/api/usuarios/user-info?email=${email}`,
+        `https://three60training-jp4i.onrender.com/api/user-info?email=${email}`,
         { credentials: "include" }
       );
       const data = await response.json();

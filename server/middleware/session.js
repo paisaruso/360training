@@ -10,6 +10,7 @@ module.exports = (app) => {
       store: new pgSession({
         pool, // Usa la conexión existente
         tableName: "session",
+        sidType: "text", // Asegura que `sid` sea tratado como texto
       }),
       secret: process.env.AUTH0_SECRET || "supersecret", // Clave secreta
       resave: false,

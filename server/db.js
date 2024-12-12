@@ -13,14 +13,6 @@ const pool = new Pool({
   port: process.env.PGPORT,
 });
 
-/*const pool = new Pool({
-    user: 'postgres.bsexqceevxgljnvydoxj',
-    host: 'aws-0-us-east-1.pooler.supabase.com',
-    database: 'postgres',
-    password: 'BRXghMbdJXCdqLAO',
-    port: 6543,
-  });*/
-
 // Verifica la conexión (opcional)
 pool.connect((err, client, release) => {
     if (err) {

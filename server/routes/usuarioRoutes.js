@@ -4,7 +4,7 @@ const {
   createUsuario,
   updateUsuario,  
   updateEmailPassword,  
-  readUsuaioById,
+  readUsuarioById,
   readUsuarioByEmail,
   deleteUsuario,
   getUserInfo,
@@ -26,7 +26,7 @@ router.put("/:id", updateUsuario);
 router.put("/actualizar-auth0/:id", updateEmailPassword);
 
 // Leer un usuario por ID
-router.get("/:id", readUsuaioById);
+router.get("/:id", readUsuarioById);
 
 // Leer un usuario por email
 router.get("/:email", readUsuarioByEmail);

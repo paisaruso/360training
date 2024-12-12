@@ -17,7 +17,7 @@ const UserProfile = () => {
       try {
         // Llamar a la API con el SID
         const response = await fetch(
-          `https://three60training-jp4i.onrender.com/api/usuarios/user-session?sid=${sid}`,
+          `https://three60training-jp4i.onrender.com/api/user-session?sid=${sid}`,
           { credentials: "include" }
         );
 
@@ -33,7 +33,7 @@ const UserProfile = () => {
 
         // Ahora que tenemos el email, obtener los datos del usuario
         const userInfoResponse = await fetch(
-          `https://three60training-jp4i.onrender.com/api/usuarios/user-info?email=${sessionData.email}`,
+          `https://three60training-jp4i.onrender.com/api/user-info?email=${sessionData.email}`,
           { credentials: "include" }
         );
 
