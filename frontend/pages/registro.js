@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 
 export default function Registro() {
   const [deportes, setDeportes] = useState([]);
+  const [entrenadores, setEntrenadores] = useState([]);
   const [formData, setFormData] = useState({
     nombre: "",
     correo_electronico: "",
@@ -15,6 +16,7 @@ export default function Registro() {
     nivel_experiencia: "",
     especialidad: "",
     id_deporte: "",
+    id_entrenador: "",
   });
 
   useEffect(() => {
@@ -33,7 +35,20 @@ export default function Registro() {
         console.error("Error al obtener los deportes:", error);
       }
     };
+
+    // Obtener lista de entrenadores
+    const fetchEntrenadores = async () => {
+      try {
+        const response = await fetch("https://three60training-jp4i.onrender.com/api/entrenadores");
+        const data = await response.json();
+        setEntrenadores(data);
+      } catch (error) {
+        console.error("Error al obtener los entrenadores:", error);
+      }
+    };
+
     fetchDeportes();
+    fetchEntrenadores();
   }, []);
 
   const handleChange = (e) => {
@@ -72,6 +87,7 @@ export default function Registro() {
             altura: formData.altura,
             nivel_experiencia: formData.nivel_experiencia,
             id_deporte: formData.id_deporte,
+            id_entrenador: formData.id_entrenador,
           }),
         });
       } else if (formData.tipo_usuario === "Entrenador") {
@@ -248,6 +264,22 @@ export default function Registro() {
                   {deportes.map((deporte) => (
                     <option key={deporte.id_deporte} value={deporte.id_deporte}>
                       {deporte.nombre}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Entrenador</label>
+                <select
+                  name="id_entrenador"
+                  value={formData.id_entrenador}
+                  onChange={handleChange}
+                  className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
+                >
+                  <option value="">Seleccione un entrenador</option>
+                  {entrenadores.map((entrenador) => (
+                    <option key={entrenador.id_entrenador} value={entrenador.id_entrenador}>
+                      {entrenador.nombre_usuario}
                     </option>
                   ))}
                 </select>

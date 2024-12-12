@@ -11,7 +11,8 @@ CREATE TABLE Usuarios (
     correo_electronico VARCHAR(100) UNIQUE NOT NULL,
     contrasena VARCHAR(255) NOT NULL,
     tipo_usuario VARCHAR(20) CHECK (tipo_usuario IN ('Entrenador', 'Deportista')) NOT NULL,
-    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    club VARCHAR(100) NOT NULL
 );
 
 -- Tabla Deportistas
