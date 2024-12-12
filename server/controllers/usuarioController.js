@@ -33,7 +33,7 @@ const createUsuario = async (req, res, next) => {
     });
 
     // Extraer el ID de Auth0
-    const auth0Id = auth0User?.user_id || null;
+    const auth0Id = auth0User.data?.user_id || null;
 
     // Guardar usuario en la base de datos (Supabase)
     const result = await pool.query(
@@ -100,7 +100,7 @@ const updateEmailPassword = async (req, res) => {
     }
 }
 
-const readUsuaioById = async (req, res) => {
+const readUsuarioById = async (req, res) => {
     const { id } = req.params;
     try {
       const result = await pool.query(
@@ -199,23 +199,31 @@ const getUserInfo = async (req, res) => {
 
 // Función para obtener datos de sesión desde la base de datos
 const getSessionData = async (sid) => {
+  console.log("Consultando sesión con SID:", sid); // Log del SID recibido
   const result = await pool.query("SELECT sess FROM session WHERE sid = $1", [sid]);
+  console.log("Resultado de la consulta a la base de datos:", result.rows); // Log del resultado de la consulta  
   return result.rows[0]?.sess || null; // Retorna el JSON almacenado en el campo `sess`
 };
 
 // Endpoint para obtener datos de sesión
 const getUserSession = async (req, res) => {
   const sid = req.query.sid; // Obtenemos el SID del query string
+  console.log("SID recibido en el query string:", sid); // Log del SID recibido
+
   if (!sid) {
+    console.error("Error: SID no proporcionado");
     return res.status(400).json({ error: "Session ID no proporcionado" });
   }
 
   try {
     const sessionData = await getSessionData(sid);
+    console.log("Datos de sesión obtenidos:", sessionData); // Log de los datos obtenidos
     if (!sessionData || !sessionData.userEmail) {
+      console.error("Error: El correo del usuario no está disponible en los datos de sesión");
       return res.status(401).json({ error: "Sesión no válida o expirada" });
     }
 
+    console.log("Correo electrónico encontrado:", sessionData.userEmail);
     res.json({ email: sessionData.userEmail }); // Retorna el correo almacenado en la sesión
   } catch (error) {
     console.error("Error obteniendo datos de sesión:", error);
@@ -228,7 +236,7 @@ module.exports = {
   createUsuario,
   updateUsuario,  
   updateEmailPassword,  
-  readUsuaioById,
+  readUsuarioById,
   readUsuarioByEmail,
   deleteUsuario,
   getUserInfo,
