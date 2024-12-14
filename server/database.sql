@@ -79,12 +79,29 @@ CREATE TABLE "ejercicio_fisico" (
   "peso" integer
 );
 
+CREATE TABLE "tipo_ejercicio" (
+  "id_tipo_ejercicio" SERIAL PRIMARY KEY,
+  "nombre" VARCHAR(255) NOT NULL,
+  "usa_tiempo" BOOLEAN DEFAULT FALSE,
+  "usa_repeticiones" BOOLEAN DEFAULT FALSE,
+  "usa_series" BOOLEAN DEFAULT FALSE,
+  "usa_peso" BOOLEAN DEFAULT FALSE
+);
+
 CREATE TABLE "comentarios" (
   "id_comentario" integer PRIMARY KEY,
   "id_entrenador" integer NOT NULL,
   "id_deportista" integer NOT NULL,
   "contenido" text,
   "fecha" timestamp
+);
+
+CREATE TABLE tipo_ejercicio_especifico (
+    id_tipo_ejercicio SERIAL PRIMARY KEY, -- ID único del tipo de ejercicio
+    nombre_ejercicio VARCHAR(100) NOT NULL, -- Nombre del ejercicio (ej. "Disparo")
+    id_deporte INT NOT NULL REFERENCES deporte(id_deporte) ON DELETE CASCADE, -- Relación con la tabla Deporte
+    descripcion TEXT, -- Descripción opcional del ejercicio
+    tabla_asociada VARCHAR(100) NOT NULL -- Nombre de la tabla donde se guardan los datos del ejercicio
 );
 
 ALTER TABLE "deportistas" ADD COLUMN "id_entrenador" integer;
@@ -115,6 +132,19 @@ ALTER TABLE "entrenadores" ADD FOREIGN KEY ("id_usuario") REFERENCES "usuarios" 
 
 ALTER TABLE "deportistas" ADD FOREIGN KEY ("id_usuario") REFERENCES "usuarios" ("id_usuario");
 
+ALTER TABLE "tipo_ejercicio" ADD COLUMN "id_creado_por" INTEGER;
+
+ALTER TABLE "tipo_ejercicio" 
+ADD FOREIGN KEY ("id_creado_por") REFERENCES "entrenadores" ("id_entrenador") ON DELETE SET NULL;
+
+ALTER TABLE "ejercicio_fisico" RENAME COLUMN "tipo" TO "id_tipo_ejercicio";
+
+ALTER TABLE "ejercicio_fisico" 
+ALTER COLUMN "id_tipo_ejercicio" TYPE INTEGER USING "id_tipo_ejercicio"::INTEGER;
+
+ALTER TABLE "ejercicio_fisico" 
+ADD FOREIGN KEY ("id_tipo_ejercicio") REFERENCES "tipo_ejercicio" ("id_tipo_ejercicio") ON DELETE RESTRICT;
+
 ALTER TABLE rutina_fisica ALTER COLUMN id_rutina DROP DEFAULT;
 ALTER TABLE rutina_fisica ALTER COLUMN id_rutina ADD GENERATED ALWAYS AS IDENTITY;
 
@@ -130,3 +160,5 @@ ALTER TABLE comentarios ALTER COLUMN id_comentario ADD GENERATED ALWAYS AS IDENT
 ALTER TABLE rutina_especifica ALTER COLUMN fecha SET DEFAULT CURRENT_DATE;
 ALTER TABLE rutina_fisica ALTER COLUMN fecha SET DEFAULT CURRENT_DATE;
 ALTER TABLE comentarios ALTER COLUMN fecha SET DEFAULT CURRENT_DATE;
+
+

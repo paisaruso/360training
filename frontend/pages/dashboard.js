@@ -133,6 +133,9 @@ const Dashboard = () => {
             <p>
               <strong>Deporte:</strong> {additionalInfo.id_deporte}
             </p>
+            <p><strong>Entrenador: </strong>
+              {additionalInfo.nombre_entrenador || "No asignado"}
+            </p>
           </>
         )}
 

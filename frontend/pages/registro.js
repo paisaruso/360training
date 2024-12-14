@@ -90,6 +90,14 @@ export default function Registro() {
             id_entrenador: formData.id_entrenador,
           }),
         });
+        await fetch("https://three60training-jp4i.onrender.com/api/usuario-deporte", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id_usuario: usuario.id_usuario,
+            id_deporte: formData.id_deporte,
+          }),
+        });
       } else if (formData.tipo_usuario === "Entrenador") {
         await fetch("https://three60training-jp4i.onrender.com/api/entrenadores", {
           method: "POST",
