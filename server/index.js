@@ -15,6 +15,7 @@ const ejercicioFisicoRoutes = require('./routes/ejercicioFisicoRoutes');
 const tipoEjercicioEspecificoRoutes = require('./routes/tipoEjercicioEspecificoRoutes');
 const rutinaEspecificaRoutes = require('./routes/rutinaEspecificaRoutes');
 const ejercicioDisparoRoutes = require('./routes/ejercicioDisparoRoutes');
+const comentariosRoutes = require('./routes/comentariosRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -122,6 +123,7 @@ app.use('/api/ejercicio_fisico', ejercicioFisicoRoutes);
 app.use('/api/tipo_ejercicio_especifico', tipoEjercicioEspecificoRoutes);
 app.use('/api/rutina_especifica', rutinaEspecificaRoutes);
 app.use('/api/ejercicio_disparo', ejercicioDisparoRoutes);
+app.use('/api/comentarios', comentariosRoutes);
 
 // Inicio del servidor
 app.listen(PORT, () => {
