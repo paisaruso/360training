@@ -7,7 +7,10 @@ const {
   getTotalFlechasLanzadas,
   comparePuntajeEntreDeportistas,
   getHistorialAsistenciaPorEntrenador,
-  getRendimientoFisico
+  getRendimientoFisico,
+  getPromedioPuntajesPorCategoria,
+  getCantidadRutinasPorPeriodo,
+  getComparacionDistanciasFrecuentes
 } = require('../controllers/analyticsController');
 
 // Definimos la ruta para la evolución del puntaje
@@ -28,6 +31,15 @@ router.get('/historial-asistencia', getHistorialAsistenciaPorEntrenador);
 
 // 6) Comparación de rendimiento en ejercicios físicos
 router.get('/rendimiento-fisico', getRendimientoFisico);
+
+// 7) Promedio de puntajes en ejercicios específicos por categoría/nivel
+router.get('/promedio-puntajes-categoria', getPromedioPuntajesPorCategoria);
+
+// 8) Cantidad de rutinas registradas (por tipo) durante un período (diario, semanal, mensual)
+router.get('/cantidad-rutinas-por-periodo', getCantidadRutinasPorPeriodo);
+
+// 9) Comparación entre distancias más frecuentes y puntajes asociados
+router.get('/comparacion-distancias-frecuentes', getComparacionDistanciasFrecuentes);
 
 
 module.exports = router;
