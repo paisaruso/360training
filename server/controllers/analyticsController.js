@@ -519,6 +519,7 @@ const getHistorialAsistenciaPorEntrenador = async (req, res) => {
         WHERE ${baseWhere}
         `;
       const especRes = await pool.query(queryRutEspecifica, params);
+      const totalEsp = especRes.rows[0].total_especificas;
 
       // 3) Para rutina_fisica:
       const queryRutFisica = `
