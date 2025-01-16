@@ -493,47 +493,41 @@ const getHistorialAsistenciaPorEntrenador = async (req, res) => {
     for (let dep of deportistas) {
       const { id_deportista, nombre_deportista } = dep;
 
-      // a) Contar rutinas específicas
-      let whereClause = "WHERE re.id_deportista = $1";
+      // 1) Construye la cláusula base de filtrado (por id_deportista, fechas, etc.)
+      let baseWhere = "id_deportista = $1";
       const params = [id_deportista];
       let paramIndex = 2;
 
       if (fechaInicio && fechaFin) {
-        whereClause += ` AND re.fecha BETWEEN $${paramIndex} AND $${
-          paramIndex + 1
-        }`;
+        baseWhere += ` AND fecha BETWEEN $${paramIndex} AND $${paramIndex + 1}`;
         params.push(fechaInicio, fechaFin);
         paramIndex += 2;
       } else if (fechaInicio) {
-        whereClause += ` AND re.fecha >= $${paramIndex}`;
+        baseWhere += ` AND fecha >= $${paramIndex}`;
         params.push(fechaInicio);
         paramIndex++;
       } else if (fechaFin) {
-        whereClause += ` AND re.fecha <= $${paramIndex}`;
+        baseWhere += ` AND fecha <= $${paramIndex}`;
         params.push(fechaFin);
         paramIndex++;
       }
 
+      // 2) Para rutina_especifica:
       const queryRutEspecifica = `
-          SELECT COUNT(*)::int AS total_especificas
-          FROM rutina_especifica re
-          ${whereClause}
+        SELECT COUNT(*)::int AS total_especificas
+        FROM rutina_especifica
+        WHERE ${baseWhere}
         `;
       const especRes = await pool.query(queryRutEspecifica, params);
-      const totalEsp = especRes.rows[0].total_especificas;
 
-      // b) Contar rutinas físicas
-      const whereClauseFisica = whereClause.replace("re.", "rf.");
+      // 3) Para rutina_fisica:
       const queryRutFisica = `
         SELECT COUNT(*)::int AS total_fisicas
-        FROM rutina_fisica rf
-        ${whereClauseFisica}
+        FROM rutina_fisica
+        WHERE ${baseWhere}
         `;
       const fisicaRes = await pool.query(queryRutFisica, params);
       const totalFis = fisicaRes.rows[0].total_fisicas;
-
-      // c) Ejercicios totales (opcional)
-      //    Podrías hacer otra(s) consulta(s) para contar en ejercicio_disparo, ejercicio_fisico, etc.
 
       resultados.push({
         id_deportista,
@@ -668,36 +662,38 @@ const getRendimientoFisico = async (req, res) => {
 
 // 7) Promedio de puntajes en ejercicios específicos por categoría/nivel
 const getPromedioPuntajesPorCategoria = async (req, res) => {
-    try {
-      // Datos de entrada: nombreCategoria (por ej. "Principiante"), rango de fechas (opcional)
-      const { nombreCategoria, fechaInicio, fechaFin } = req.query;
-      if (!nombreCategoria) {
-        return res.status(400).json({
-          error: "Debe proporcionar la categoría o nivel de los deportistas."
-        });
-      }
-  
-      // 1. Filtrar deportistas por su nivel_experiencia = nombreCategoria
-      //    Unimos con rutina_especifica + ejercicio_disparo para obtener el puntaje
-      let whereClause = "WHERE d.nivel_experiencia = $1";
-      const params = [nombreCategoria];
-      let paramIndex = 2;
-  
-      if (fechaInicio && fechaFin) {
-        whereClause += ` AND re.fecha BETWEEN $${paramIndex} AND $${paramIndex + 1}`;
-        params.push(fechaInicio, fechaFin);
-        paramIndex += 2;
-      } else if (fechaInicio) {
-        whereClause += ` AND re.fecha >= $${paramIndex}`;
-        params.push(fechaInicio);
-        paramIndex++;
-      } else if (fechaFin) {
-        whereClause += ` AND re.fecha <= $${paramIndex}`;
-        params.push(fechaFin);
-        paramIndex++;
-      }
-  
-      const query = `
+  try {
+    // Datos de entrada: nombreCategoria (por ej. "Principiante"), rango de fechas (opcional)
+    const { nombreCategoria, fechaInicio, fechaFin } = req.query;
+    if (!nombreCategoria) {
+      return res.status(400).json({
+        error: "Debe proporcionar la categoría o nivel de los deportistas.",
+      });
+    }
+
+    // 1. Filtrar deportistas por su nivel_experiencia = nombreCategoria
+    //    Unimos con rutina_especifica + ejercicio_disparo para obtener el puntaje
+    let whereClause = "WHERE d.nivel_experiencia = $1";
+    const params = [nombreCategoria];
+    let paramIndex = 2;
+
+    if (fechaInicio && fechaFin) {
+      whereClause += ` AND re.fecha BETWEEN $${paramIndex} AND $${
+        paramIndex + 1
+      }`;
+      params.push(fechaInicio, fechaFin);
+      paramIndex += 2;
+    } else if (fechaInicio) {
+      whereClause += ` AND re.fecha >= $${paramIndex}`;
+      params.push(fechaInicio);
+      paramIndex++;
+    } else if (fechaFin) {
+      whereClause += ` AND re.fecha <= $${paramIndex}`;
+      params.push(fechaFin);
+      paramIndex++;
+    }
+
+    const query = `
         SELECT d.nivel_experiencia,
                AVG(ed.promedio_por_flecha) AS promedio_puntaje
           FROM Deportistas d
@@ -706,58 +702,59 @@ const getPromedioPuntajesPorCategoria = async (req, res) => {
         ${whereClause}
         GROUP BY d.nivel_experiencia
       `;
-  
-      const result = await pool.query(query, params);
-  
-      if (result.rows.length === 0) {
-        return res.json({
-          categoria: nombreCategoria,
-          promedio_puntaje: 0,
-          mensaje: "No se encontraron datos para esta categoría en el rango dado."
-        });
-      }
-  
-      const row = result.rows[0];
+
+    const result = await pool.query(query, params);
+
+    if (result.rows.length === 0) {
       return res.json({
-        categoria: row.nivel_experiencia,
-        promedio_puntaje: parseFloat(row.promedio_puntaje)
-      });
-    } catch (error) {
-      console.error("Error en getPromedioPuntajesPorCategoria:", error);
-      return res.status(500).json({
-        error: "Error interno del servidor"
+        categoria: nombreCategoria,
+        promedio_puntaje: 0,
+        mensaje:
+          "No se encontraron datos para esta categoría en el rango dado.",
       });
     }
-  };
 
-  // 8) Cantidad de rutinas registradas (por tipo) durante un período (diario, semanal, mensual)
+    const row = result.rows[0];
+    return res.json({
+      categoria: row.nivel_experiencia,
+      promedio_puntaje: parseFloat(row.promedio_puntaje),
+    });
+  } catch (error) {
+    console.error("Error en getPromedioPuntajesPorCategoria:", error);
+    return res.status(500).json({
+      error: "Error interno del servidor",
+    });
+  }
+};
+
+// 8) Cantidad de rutinas registradas (por tipo) durante un período (diario, semanal, mensual)
 const getCantidadRutinasPorPeriodo = async (req, res) => {
-    try {
-      // Entrada: el "modo" (daily, weekly, monthly), fechaInicio, fechaFin
-      const { modo = 'daily', fechaInicio, fechaFin } = req.query;
-      // Validar que existan ambas fechas, si se requiere
-      if (!fechaInicio || !fechaFin) {
-        return res.status(400).json({
-          error: "Debe proporcionar fechaInicio y fechaFin"
-        });
-      }
-  
-      // Definir la función de agrupación temporal según 'modo'
-      // En Postgres, se puede usar DATE_TRUNC('month', re.fecha) o 'week', 'day'
-      let dateTruncArg;
-      switch (modo) {
-        case 'weekly':
-          dateTruncArg = 'week';
-          break;
-        case 'monthly':
-          dateTruncArg = 'month';
-          break;
-        default:
-          dateTruncArg = 'day';
-      }
-  
-      // Consulta con UNION ALL para combinar rutinas específicas y físicas
-      const query = `
+  try {
+    // Entrada: el "modo" (daily, weekly, monthly), fechaInicio, fechaFin
+    const { modo = "daily", fechaInicio, fechaFin } = req.query;
+    // Validar que existan ambas fechas, si se requiere
+    if (!fechaInicio || !fechaFin) {
+      return res.status(400).json({
+        error: "Debe proporcionar fechaInicio y fechaFin",
+      });
+    }
+
+    // Definir la función de agrupación temporal según 'modo'
+    // En Postgres, se puede usar DATE_TRUNC('month', re.fecha) o 'week', 'day'
+    let dateTruncArg;
+    switch (modo) {
+      case "weekly":
+        dateTruncArg = "week";
+        break;
+      case "monthly":
+        dateTruncArg = "month";
+        break;
+      default:
+        dateTruncArg = "day";
+    }
+
+    // Consulta con UNION ALL para combinar rutinas específicas y físicas
+    const query = `
         SELECT tipo_rutina, periodo, COUNT(*)::int as total
         FROM (
           SELECT 'especifica' AS tipo_rutina,
@@ -775,59 +772,61 @@ const getCantidadRutinasPorPeriodo = async (req, res) => {
         GROUP BY tipo_rutina, periodo
         ORDER BY periodo, tipo_rutina
       `;
-  
-      const result = await pool.query(query, [fechaInicio, fechaFin]);
-  
-      // Estructuramos la respuesta
-      // Podríamos devolver un array de { periodo, tipo_rutina, total }
-      // O un objeto: { [periodo]: { especifica: X, fisica: Y } }
-      // Aquí haremos la segunda forma para ilustrar.
-      const dataMap = {};
-      for (const row of result.rows) {
-        const periodKey = row.periodo.toISOString(); // o formateas la fecha
-        if (!dataMap[periodKey]) {
-          dataMap[periodKey] = { especifica: 0, fisica: 0 };
-        }
-        dataMap[periodKey][row.tipo_rutina] = row.total;
-      }
-  
-      return res.json({
-        modo,
-        fechaInicio,
-        fechaFin,
-        resumen: dataMap
-      });
-    } catch (error) {
-      console.error("Error en getCantidadRutinasPorPeriodo:", error);
-      return res.status(500).json({
-        error: "Error interno del servidor"
-      });
-    }
-  };
 
-  // 9) Comparación entre distancias más frecuentes y puntajes asociados
-const getComparacionDistanciasFrecuentes = async (req, res) => {
-    try {
-      const { fechaInicio, fechaFin } = req.query;
-      let whereClause = '';
-      const params = [];
-      let paramIndex = 1;
-  
-      if (fechaInicio && fechaFin) {
-        whereClause = `WHERE re.fecha BETWEEN $${paramIndex} AND $${paramIndex+1}`;
-        params.push(fechaInicio, fechaFin);
-        paramIndex += 2;
-      } else if (fechaInicio) {
-        whereClause = `WHERE re.fecha >= $${paramIndex}`;
-        params.push(fechaInicio);
-        paramIndex++;
-      } else if (fechaFin) {
-        whereClause = `WHERE re.fecha <= $${paramIndex}`;
-        params.push(fechaFin);
-        paramIndex++;
+    const result = await pool.query(query, [fechaInicio, fechaFin]);
+
+    // Estructuramos la respuesta
+    // Podríamos devolver un array de { periodo, tipo_rutina, total }
+    // O un objeto: { [periodo]: { especifica: X, fisica: Y } }
+    // Aquí haremos la segunda forma para ilustrar.
+    const dataMap = {};
+    for (const row of result.rows) {
+      const periodKey = row.periodo.toISOString(); // o formateas la fecha
+      if (!dataMap[periodKey]) {
+        dataMap[periodKey] = { especifica: 0, fisica: 0 };
       }
-  
-      const query = `
+      dataMap[periodKey][row.tipo_rutina] = row.total;
+    }
+
+    return res.json({
+      modo,
+      fechaInicio,
+      fechaFin,
+      resumen: dataMap,
+    });
+  } catch (error) {
+    console.error("Error en getCantidadRutinasPorPeriodo:", error);
+    return res.status(500).json({
+      error: "Error interno del servidor",
+    });
+  }
+};
+
+// 9) Comparación entre distancias más frecuentes y puntajes asociados
+const getComparacionDistanciasFrecuentes = async (req, res) => {
+  try {
+    const { fechaInicio, fechaFin } = req.query;
+    let whereClause = "";
+    const params = [];
+    let paramIndex = 1;
+
+    if (fechaInicio && fechaFin) {
+      whereClause = `WHERE re.fecha BETWEEN $${paramIndex} AND $${
+        paramIndex + 1
+      }`;
+      params.push(fechaInicio, fechaFin);
+      paramIndex += 2;
+    } else if (fechaInicio) {
+      whereClause = `WHERE re.fecha >= $${paramIndex}`;
+      params.push(fechaInicio);
+      paramIndex++;
+    } else if (fechaFin) {
+      whereClause = `WHERE re.fecha <= $${paramIndex}`;
+      params.push(fechaFin);
+      paramIndex++;
+    }
+
+    const query = `
         SELECT ed.distancia,
                COUNT(*)::int AS frecuencia,
                AVG(ed.promedio_por_flecha) AS puntaje_promedio
@@ -838,23 +837,23 @@ const getComparacionDistanciasFrecuentes = async (req, res) => {
         ORDER BY frecuencia DESC
         -- Podrías LIMITar si quieres solo las "top 5" distancias
       `;
-  
-      const result = await pool.query(query, params);
-      return res.json({
-        rangoFechas: fechaInicio || fechaFin ? { fechaInicio, fechaFin } : null,
-        distancias: result.rows.map(r => ({
-          distancia: r.distancia,
-          frecuencia: r.frecuencia,
-          puntaje_promedio: parseFloat(r.puntaje_promedio)
-        }))
-      });
-    } catch (error) {
-      console.error("Error en getComparacionDistanciasFrecuentes:", error);
-      return res.status(500).json({
-        error: "Error interno del servidor"
-      });
-    }
-  };
+
+    const result = await pool.query(query, params);
+    return res.json({
+      rangoFechas: fechaInicio || fechaFin ? { fechaInicio, fechaFin } : null,
+      distancias: result.rows.map((r) => ({
+        distancia: r.distancia,
+        frecuencia: r.frecuencia,
+        puntaje_promedio: parseFloat(r.puntaje_promedio),
+      })),
+    });
+  } catch (error) {
+    console.error("Error en getComparacionDistanciasFrecuentes:", error);
+    return res.status(500).json({
+      error: "Error interno del servidor",
+    });
+  }
+};
 
 module.exports = {
   getEvolucionPuntaje,
