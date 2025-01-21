@@ -91,7 +91,7 @@ app.get("/api/user-info", async (req, res) => {
     // Según el tipo de usuario, obtenemos información adicional
     if (user.tipo_usuario === "Deportista") {
       const athleteResult = await pool.query(
-        "SELECT d.fecha_nacimiento, d.sexo, d.peso, d.altura, d.nivel_experiencia, d.id_deporte e.nombre AS nombre_entrenador FROM Deportistas d LEFT JOIN Entrenadores e ON d.id_entrenador = e.id_entrenador WHERE id_usuario = $1",
+        "SELECT d.fecha_nacimiento, d.sexo, d.peso, d.altura, d.nivel_experiencia, d.id_deporte, e.nombre AS nombre_entrenador FROM Deportistas d LEFT JOIN Entrenadores e ON d.id_entrenador = e.id_entrenador WHERE id_usuario = $1",
         [user.id_usuario]
       );
       additionalInfo = athleteResult.rows[0] || null;
