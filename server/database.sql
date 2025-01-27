@@ -96,6 +96,16 @@ CREATE TABLE "comentarios" (
   "fecha" timestamp
 );
 
+CREATE TABLE notificaciones (
+    id_notificacion SERIAL PRIMARY KEY,
+    id_usuario INTEGER NOT NULL,
+    tipo TEXT NOT NULL, -- Ej: "comentario", "rutina", etc.
+    mensaje TEXT NOT NULL,
+    leido BOOLEAN DEFAULT FALSE,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+);
+
 CREATE TABLE tipo_ejercicio_especifico (
     id_tipo_ejercicio SERIAL PRIMARY KEY, -- ID único del tipo de ejercicio
     nombre_ejercicio VARCHAR(100) NOT NULL, -- Nombre del ejercicio (ej. "Disparo")
@@ -144,6 +154,8 @@ ALTER COLUMN "id_tipo_ejercicio" TYPE INTEGER USING "id_tipo_ejercicio"::INTEGER
 
 ALTER TABLE "ejercicio_fisico" 
 ADD FOREIGN KEY ("id_tipo_ejercicio") REFERENCES "tipo_ejercicio" ("id_tipo_ejercicio") ON DELETE RESTRICT;
+
+FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
 
 ALTER TABLE rutina_fisica ALTER COLUMN id_rutina DROP DEFAULT;
 ALTER TABLE rutina_fisica ALTER COLUMN id_rutina ADD GENERATED ALWAYS AS IDENTITY;

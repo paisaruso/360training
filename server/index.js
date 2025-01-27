@@ -16,6 +16,8 @@ const tipoEjercicioEspecificoRoutes = require('./routes/tipoEjercicioEspecificoR
 const rutinaEspecificaRoutes = require('./routes/rutinaEspecificaRoutes');
 const ejercicioDisparoRoutes = require('./routes/ejercicioDisparoRoutes');
 const comentariosRoutes = require('./routes/comentariosRoutes');
+const notificacionesRoutes = require('./routes/notificacionesRoutes');
+const analyticsRoutes = require("./routes/analyticsRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -89,7 +91,7 @@ app.get("/api/user-info", async (req, res) => {
     // Según el tipo de usuario, obtenemos información adicional
     if (user.tipo_usuario === "Deportista") {
       const athleteResult = await pool.query(
-        "SELECT d.fecha_nacimiento, d.sexo, d.peso, d.altura, d.nivel_experiencia, d.id_deporte e.nombre AS nombre_entrenador FROM Deportistas d LEFT JOIN Entrenadores e ON d.id_entrenador = e.id_entrenador WHERE id_usuario = $1",
+        "SELECT d.fecha_nacimiento, d.sexo, d.peso, d.altura, d.nivel_experiencia, d.id_deporte, u.nombre AS nombre_entrenador FROM Deportistas d LEFT JOIN Entrenadores e ON d.id_entrenador = e.id_entrenador LEFT JOIN Usuarios u ON e.id_usuario = u.id_usuario WHERE d.id_usuario = $1",
         [user.id_usuario]
       );
       additionalInfo = athleteResult.rows[0] || null;
@@ -124,6 +126,8 @@ app.use('/api/tipo_ejercicio_especifico', tipoEjercicioEspecificoRoutes);
 app.use('/api/rutina_especifica', rutinaEspecificaRoutes);
 app.use('/api/ejercicio_disparo', ejercicioDisparoRoutes);
 app.use('/api/comentarios', comentariosRoutes);
+app.use('/api/notificaciones', notificacionesRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 // Inicio del servidor
 app.listen(PORT, () => {
