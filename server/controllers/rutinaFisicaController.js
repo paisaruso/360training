@@ -79,24 +79,74 @@ const getRutinasFisicasByDeportista = async (req, res) => {
 
 // Actualizar comentarios en una rutina física
 const updateRutinaFisica = async (req, res) => {
-    const { id } = req.params;
-    const { comentario_deportista, comentario_entrenador } = req.body;
+    const { id } = req.params; // id de la rutina
+    const { comentario_deportista, comentario_entrenador, id_entrenador } = req.body;
+  
     try {
-        const result = await pool.query(
-            `UPDATE rutina_fisica 
-             SET comentario_deportista = COALESCE($1, comentario_deportista), 
-                 comentario_entrenador = COALESCE($2, comentario_entrenador) 
-             WHERE id_rutina = $3 RETURNING *`,
-            [comentario_deportista, comentario_entrenador, id]
-        );
-        if (result.rows.length === 0) {
-            return res.status(404).json({ error: 'Rutina no encontrada' });
-        }
-        res.status(200).json(result.rows[0]);
+      // 1. Actualizar en la tabla
+      const result = await pool.query(
+        `UPDATE rutina_fisica
+         SET comentario_deportista = COALESCE($1, comentario_deportista),
+             comentario_entrenador = COALESCE($2, comentario_entrenador)
+         WHERE id_rutina = $3
+         RETURNING *`,
+        [comentario_deportista, comentario_entrenador, id]
+      );
+  
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'Rutina no encontrada' });
+      }
+      const rutina = result.rows[0];
+  
+      // 2. Verificar si hay comentario de entrenador nuevo
+      if (!comentario_entrenador) {
+        return res.status(200).json(rutina);
+      }
+  
+      // 3. Obtener nombre del entrenador
+      const entrenadorResult = await pool.query(
+        `
+        SELECT e.id_usuario, u.nombre
+        FROM entrenadores e
+        JOIN usuarios u ON e.id_usuario = u.id_usuario
+        WHERE e.id_entrenador = $1
+        `,
+        [id_entrenador]
+      );
+      if (entrenadorResult.rows.length === 0) {
+        return res.status(404).json({ error: 'Entrenador no encontrado' });
+      }
+      const { nombre } = entrenadorResult.rows[0];
+  
+      // 4. Obtener id_usuario del deportista
+      //    Sabemos que la tabla rutina_fisica tiene el campo id_deportista
+      const { id_deportista } = rutina;
+      const deportistaResult = await pool.query(
+        `SELECT id_usuario FROM deportistas WHERE id_deportista = $1`,
+        [id_deportista]
+      );
+      if (deportistaResult.rows.length === 0) {
+        return res.status(404).json({ error: 'Deportista no encontrado' });
+      }
+      const { id_usuario } = deportistaResult.rows[0];
+  
+      // 5. Crear notificación
+      await pool.query(
+        `INSERT INTO notificaciones (id_usuario, mensaje, tipo)
+         VALUES ($1, $2, $3)`,
+        [
+          id_usuario,
+          `El entrenador ${nombre} ha comentado tu rutina física (ID: ${id}): "${comentario_entrenador}"`,
+          'comentario rutina_fisica'
+        ]
+      );
+  
+      res.status(200).json(rutina);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.message });
     }
-};
+  };
+  
 
 // Eliminar una rutina física
 const deleteRutinaFisica = async (req, res) => {
