@@ -8,7 +8,7 @@ export default function Registro() {
     correo_electronico: "",
     contrasena: "",
     tipo_usuario: "Deportista",
-    club:"",
+    club: "",
     fecha_nacimiento: "",
     sexo: "",
     peso: "",
@@ -18,14 +18,14 @@ export default function Registro() {
     id_deporte: "",
     id_entrenador: "",
   });
+  const [contrasenaError, setContrasenaError] = useState("");
 
   useEffect(() => {
-    //Llenar el campo correo electronico si llega al formulario desde Auth0 con el gmail
     const email = new URLSearchParams(window.location.search).get("email");
     if (email) {
       setFormData((prevData) => ({ ...prevData, correo_electronico: email }));
     }
-    // Obtener lista de deportes desde el backend
+
     const fetchDeportes = async () => {
       try {
         const response = await fetch("https://three60training-jp4i.onrender.com/api/deportes");
@@ -36,7 +36,6 @@ export default function Registro() {
       }
     };
 
-    // Obtener lista de entrenadores
     const fetchEntrenadores = async () => {
       try {
         const response = await fetch("https://three60training-jp4i.onrender.com/api/entrenadores");
@@ -56,8 +55,18 @@ export default function Registro() {
     setFormData({ ...formData, [name]: value });
   };
 
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    return passwordRegex.test(password);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validatePassword(formData.contrasena)) {
+      setContrasenaError("La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.");
+      return;
+    }
 
     try {
       const response = await fetch("https://three60training-jp4i.onrender.com/api/usuarios", {
@@ -68,7 +77,7 @@ export default function Registro() {
           correo_electronico: formData.correo_electronico,
           contrasena: formData.contrasena,
           tipo_usuario: formData.tipo_usuario,
-          club:formData.club,
+          club: formData.club,
         }),
       });
 
@@ -117,207 +126,219 @@ export default function Registro() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <div className="w-full max-w-lg p-8 bg-white shadow-md rounded-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">
-          Registro de Usuario
-        </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Nombre
-            </label>
-            <input
-              type="text"
-              name="nombre"
-              value={formData.nombre}
-              onChange={handleChange}
-              required
-              className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
-            />
-          </div>
+    <div className="flex min-h-screen">
+      {/* Contenedor para la imagen izquierda */}
+      <div
+        className="w-1/3 bg-cover bg-center"
+        style={{
+          backgroundImage: "url('/images/arco3.jpeg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      ></div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Correo Electrónico
-            </label>
-            <input
-              type="email"
-              name="correo_electronico"
-              value={formData.correo_electronico}
-              onChange={handleChange}
-              required
-              className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Contraseña: Minimo 8 carácteres, una mayuscula y un numero
-            </label>
-            <input
-              type="password"
-              name="contrasena"
-              value={formData.contrasena}
-              onChange={handleChange}
-              required
-              className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Club
-            </label>
-            <input
-              type="text"
-              name="club"
-              value={formData.club}
-              onChange={handleChange}
-              required
-              className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Tipo de Usuario
-            </label>
-            <select
-              name="tipo_usuario"
-              value={formData.tipo_usuario}
-              onChange={handleChange}
-              className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
-            >
-              <option value="Deportista">Deportista</option>
-              <option value="Entrenador">Entrenador</option>
-            </select>
-          </div>
-
-          {formData.tipo_usuario === "Deportista" && (
-            <>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Fecha de Nacimiento
-                </label>
-                <input
-                  type="date"
-                  name="fecha_nacimiento"
-                  value={formData.fecha_nacimiento}
-                  onChange={handleChange}
-                  className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Sexo
-                </label>
-                <select
-                  name="sexo"
-                  value={formData.sexo}
-                  onChange={handleChange}
-                  className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
-                >
-                  <option value="Masculino">Masculino</option>
-                  <option value="Femenino">Femenino</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Peso (kg)
-                </label>
-                <input
-                  type="number"
-                  name="peso"
-                  value={formData.peso}
-                  onChange={handleChange}
-                  className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Altura (cm)
-                </label>
-                <input
-                  type="number"
-                  name="altura"
-                  value={formData.altura}
-                  onChange={handleChange}
-                  className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Nivel de Experiencia
-                </label>
-                <input
-                  type="text"
-                  name="nivel_experiencia"
-                  value={formData.nivel_experiencia}
-                  onChange={handleChange}
-                  className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Deporte
-                </label>
-                <select
-                  name="id_deporte"
-                  value={formData.id_deporte}
-                  onChange={handleChange}
-                  className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
-                >
-                  <option value="">Seleccione un deporte</option>
-                  {deportes.map((deporte) => (
-                    <option key={deporte.id_deporte} value={deporte.id_deporte}>
-                      {deporte.nombre}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Entrenador</label>
-                <select
-                  name="id_entrenador"
-                  value={formData.id_entrenador}
-                  onChange={handleChange}
-                  className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
-                >
-                  <option value="">Seleccione un entrenador</option>
-                  {entrenadores.map((entrenador) => (
-                    <option key={entrenador.id_entrenador} value={entrenador.id_entrenador}>
-                      {entrenador.nombre_usuario}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </>
-          )}
-
-          {formData.tipo_usuario === "Entrenador" && (
+      {/* Contenedor para el formulario (en el centro) */}
+      <div className="w-1/3 flex items-center justify-center bg-white p-8">
+        <div className="w-full max-w-lg">
+          <h2 className="text-2xl font-bold mb-6 text-center">Registro de Usuario</h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Especialidad
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Nombre</label>
               <input
                 type="text"
-                name="especialidad"
-                value={formData.especialidad}
+                name="nombre"
+                value={formData.nombre}
                 onChange={handleChange}
+                required
                 className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
               />
             </div>
-          )}
 
-          <button
-            type="submit"
-            className="w-full p-2 bg-blue-600 text-white font-bold rounded-md hover:bg-blue-700"
-          >
-            Registrarse
-          </button>
-        </form>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+              <input
+                type="email"
+                name="correo_electronico"
+                value={formData.correo_electronico}
+                onChange={handleChange}
+                required
+                className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Contraseña: Mínimo 8 caracteres, una mayúscula y un número
+              </label>
+              <input
+                type="password"
+                name="contrasena"
+                value={formData.contrasena}
+                onChange={handleChange}
+                required
+                className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
+              />
+              {contrasenaError && <p className="text-red-500 text-sm">{contrasenaError}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Club</label>
+              <input
+                type="text"
+                name="club"
+                value={formData.club}
+                onChange={handleChange}
+                required
+                className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Tipo de Usuario</label>
+              <select
+                name="tipo_usuario"
+                value={formData.tipo_usuario}
+                onChange={handleChange}
+                className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
+              >
+                <option value="Deportista">Deportista</option>
+                <option value="Entrenador">Entrenador</option>
+              </select>
+            </div>
+
+            {formData.tipo_usuario === "Deportista" && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Fecha de Nacimiento</label>
+                  <input
+                    type="date"
+                    name="fecha_nacimiento"
+                    value={formData.fecha_nacimiento}
+                    onChange={handleChange}
+                    className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
+                  />
+                </div>
+
+                {/* Otros campos para Deportista */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Sexo</label>
+                  <select
+                    name="sexo"
+                    value={formData.sexo}
+                    onChange={handleChange}
+                    required
+                    className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
+                  >
+                    <option value="">Seleccione una opción</option>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Femenino">Femenino</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Peso</label>
+                  <input
+                    type="text"
+                    name="peso"
+                    value={formData.peso}
+                    onChange={handleChange}
+                    className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Altura</label>
+                  <input
+                    type="text"
+                    name="altura"
+                    value={formData.altura}
+                    onChange={handleChange}
+                    className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Nivel de Experiencia</label>
+                  <select
+                    name="nivel_experiencia"
+                    value={formData.nivel_experiencia}
+                    onChange={handleChange}
+                    className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
+                  >
+                    <option value="">Seleccione un nivel</option>
+                    <option value="Principiante">Principiante</option>
+                    <option value="Medio">Medio</option>
+                    <option value="Avanzado">Avanzado</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Deporte</label>
+                  <select
+                    name="id_deporte"
+                    value={formData.id_deporte}
+                    onChange={handleChange}
+                    className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
+                  >
+                    <option value="">Seleccione un deporte</option>
+                    {deportes.map((deporte) => (
+                      <option key={deporte.id_deporte} value={deporte.id_deporte}>
+                        {deporte.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Entrenador</label>
+                  <select
+                    name="id_entrenador"
+                    value={formData.id_entrenador}
+                    onChange={handleChange}
+                    className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
+                  >
+                    <option value="">Seleccione un entrenador</option>
+                    {entrenadores.map((entrenador) => (
+                      <option key={entrenador.id_entrenador} value={entrenador.id_entrenador}>
+                        {entrenador.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            )}
+
+            {formData.tipo_usuario === "Entrenador" && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Especialidad</label>
+                <input
+                  type="text"
+                  name="especialidad"
+                  value={formData.especialidad}
+                  onChange={handleChange}
+                  className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
+                />
+              </div>
+            )}
+
+            <div className="flex justify-center mt-6">
+              <button type="submit" className="bg-blue-500 text-white px-6 py-2 rounded-md">
+                Registrarse
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
+
+      {/* Contenedor para la imagen derecha */}
+      <div
+        className="w-1/3 bg-cover bg-center"
+        style={{
+          backgroundImage: "url('/images/arco2.jpeg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      ></div>
     </div>
   );
 }
