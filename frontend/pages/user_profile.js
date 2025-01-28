@@ -58,28 +58,37 @@ const UserProfile = () => {
   if (!userData) return <p>No se encontraron datos del usuario.</p>;
 
   return (
-    <div className="user-profile p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-bold text-green-500 mb-4">
-        Perfil de Usuario
-      </h1>
-      <div className="user-info p-4 bg-black rounded-lg shadow-md">
-        <p>
-          <strong>Nombre:</strong> {userData.user.nombre}
-        </p>
-        <p>
-          <strong>Correo Electrónico:</strong> {userData.user.correo_electronico}
-        </p>
+    <div className="user-profile p-6 bg-gray-100 min-h-screen flex flex-col">
+      {/* Sección superior */}
+      <div className="user-content relative z-10">
+        <h1 className="text-2xl font-bold text-green-500 mb-4">Perfil de Usuario</h1>
+        <div className="user-info p-4 bg-black rounded-lg shadow-md">
+          <p>
+            <strong>Nombre:</strong> {userData.user.nombre}
+          </p>
+          <p>
+            <strong>Correo Electrónico:</strong> {userData.user.correo_electronico}
+          </p>
+        </div>
+        <div className="flex flex-row justify-center">
+          <Link href="http://localhost:3000/dashboard">
+            <button className="w-20 justify-center p-4 bg-green-600 text-white font-bold mt-8 rounded-md hover:bg-green-700">
+              Volver
+            </button>
+          </Link>
+        </div>
       </div>
-      <div className="flex flex-row justify-center">
-        <Link href="http://localhost:3000/dashboard">
-        <button className="w-20 justify-center p-4 bg-green-600 text-white font-bold mt-8 rounded-md hover:bg-green-700 mb-6">
-          Volver
-        </button>
-      </Link>
-      </div>
-      
+
+      {/* Imagen de fondo */}
+      <div
+        className="w-full flex-grow bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url('/images/arco5.jpg')`,
+        }}
+      />
     </div>
   );
 };
 
 export default UserProfile;
+

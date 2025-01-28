@@ -79,21 +79,28 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="dashboard p-6 bg-gray-100 min-h-screen">
+    <div
+      className="dashboard p-6 min-h-screen"
+      style={{
+        backgroundImage: "url('/images/arco6.jpeg')",
+        backgroundRepeat: "repeat", // Mosaico
+        backgroundSize: "auto", // Ajuste automático del tamaño de la imagen
+      }}
+    >
       <div className="flex flex-row justify-between">
-        <h1 className="text-2xl font-bold text-green-500 mb-4">
-        Bienvenido al Dashboard
-      </h1>
-      <Link href="https://three60training-jp4i.onrender.com/auth/salir">
-        <button className="w-full p-4 bg-green-600 text-white font-bold rounded-md hover:bg-green-700 mb-6">
-          Fin de Sesión
-        </button>
-      </Link>
-      </div>
-      
+       <h1 className="text-4xl text-green-800 mb-4">
+          <strong>Bienvenido al Dashboard</strong>
+       </h1>
 
-      <div className="user-info p-4 bg-black rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-4">Datos del Usuario</h2>
+        <Link href="https://three60training-jp4i.onrender.com/auth/salir">
+          <button className="w-full p-4 bg-green-600 text-white font-bold rounded-md hover:bg-green-700 mb-6">
+            Fin de Sesión
+          </button>
+        </Link>
+      </div>
+
+      <div className="user-info p-4 bg-black bg-opacity-70 text-white rounded-lg shadow-md">
+        <h2 className="text-2xl font-semibold mb-4">Datos del Usuario</h2>
         <p>
           <strong>Nombre:</strong> {user.nombre}
         </p>
@@ -133,7 +140,8 @@ const Dashboard = () => {
             <p>
               <strong>Deporte:</strong> {additionalInfo.id_deporte}
             </p>
-            <p><strong>Entrenador: </strong>
+            <p>
+              <strong>Entrenador:</strong>{" "}
               {additionalInfo.nombre_entrenador || "No asignado"}
             </p>
           </>
