@@ -88,7 +88,7 @@ const getUnreadNotificationsCount = async (req, res) => {
         const result = await pool.query(
             `SELECT COUNT(*) AS unread_count
              FROM notificaciones
-             WHERE id_usuario = $1 AND leido = false`,
+             WHERE id_usuario = $1 AND leido = FALSE`,
             [id_usuario]
         );
         res.status(200).json(result.rows[0]);
