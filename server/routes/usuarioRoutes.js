@@ -26,10 +26,10 @@ router.put("/:id", updateUsuario);
 router.put("/actualizar-auth0/:id", updateEmailPassword);
 
 // Leer un usuario por ID
-router.get("/:id", readUsuarioById);
+router.get("/by-id/:id", readUsuarioById);
 
 // Leer un usuario por email
-router.get("/:email", readUsuarioByEmail);
+router.get("/by-email/:email", readUsuarioByEmail);
 
 // Ruta para eliminar un usuario
 router.delete("/:id", deleteUsuario);

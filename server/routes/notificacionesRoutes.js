@@ -26,6 +26,6 @@ router.delete('/:id', deleteNotificacion);
 router.put('/usuario/:id_usuario', markAllAsRead);
 
 // Obtener numero de notificaciones sin leer
-router.get('/:id', getUnreadNotificationsCount);
+router.get('/unread/:id', getUnreadNotificationsCount);
 
 module.exports = router;
