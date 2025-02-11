@@ -97,6 +97,23 @@ const getUnreadNotificationsCount = async (req, res) => {
     }
 };
 
+const getUnreadNotificacionesByUsuario = async (req, res) => {
+    const { id_usuario } = req.params;
+  
+    try {
+      const result = await pool.query(
+        `SELECT * 
+         FROM notificaciones 
+         WHERE id_usuario = $1 
+           AND leido = false
+         ORDER BY fecha DESC`,
+        [id_usuario]
+      );
+      res.status(200).json(result.rows);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
 
 module.exports = {
     createNotificacion,
@@ -105,4 +122,5 @@ module.exports = {
     deleteNotificacion,
     markAllAsRead,
     getUnreadNotificationsCount,
+    getUnreadNotificacionesByUsuario,
 };
