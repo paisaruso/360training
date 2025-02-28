@@ -155,6 +155,12 @@ ALTER COLUMN "id_tipo_ejercicio" TYPE INTEGER USING "id_tipo_ejercicio"::INTEGER
 ALTER TABLE "ejercicio_fisico" 
 ADD FOREIGN KEY ("id_tipo_ejercicio") REFERENCES "tipo_ejercicio" ("id_tipo_ejercicio") ON DELETE RESTRICT;
 
+ALTER TABLE Usuarios
+ADD COLUMN numero_documento VARCHAR(30);
+
+ALTER TABLE Usuarios
+ADD CONSTRAINT usuarios_numero_documento_uk UNIQUE (numero_documento);
+
 FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
 
 ALTER TABLE rutina_fisica ALTER COLUMN id_rutina DROP DEFAULT;

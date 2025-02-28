@@ -88,6 +88,7 @@ const getAllDeportistasExtended = async (req, res) => {
         d.id_deportista,
         d.id_usuario,
         u.nombre AS nombre_usuario,
+        u.numero_documento,
         d.fecha_nacimiento,
         d.sexo,
         d.peso,
@@ -104,7 +105,7 @@ const getAllDeportistasExtended = async (req, res) => {
     // Si viene ?search=..., añadimos condición
     // Usamos ILIKE (Postgres) para un filtrado case-insensitive
     if (search) {
-      query += ` WHERE u.nombre ILIKE $1`;
+      query += ` WHERE (u.nombre ILIKE $1 OR u.numero_documento ILIKE $1)`;
       // El patrón '%' concatena para buscar parcial
       params.push(`%${search}%`);
     }
