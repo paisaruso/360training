@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 export default function Home() {
+  console.log("🏠 Página Home cargada correctamente");
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 text-center">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
