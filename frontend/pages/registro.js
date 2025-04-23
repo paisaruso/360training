@@ -295,6 +295,7 @@ export default function Registro() {
                     name="id_entrenador"
                     value={formData.id_entrenador}
                     onChange={handleChange}
+                    required
                     className="mt-1 p-2 w-full border border-gray-300 rounded-md text-gray-800"
                   >
                     <option value="">Seleccione un entrenador</option>

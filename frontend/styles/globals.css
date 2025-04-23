@@ -46,4 +46,8 @@ body {
 .btn-logout:hover {
   background-color: #ff1a1a;
 }
+option {
+  color: black !important; /* Asegura que el texto de las opciones sea visible */
+  background-color: white !important; /* Evita que el fondo oculte el texto */
+}
 

@@ -6,6 +6,7 @@ const Dashboard = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sid, setSid] = useState("");
+  const [esEntrenador, setEsEntrenador] = useState(false);
 
   const router = useRouter();
 
@@ -26,7 +27,7 @@ const Dashboard = () => {
       );
       const data = await response.json();
       if (response.ok) {
-        return data.email; // Retorna el correo electrónico del usuario
+        return data.email;
       } else {
         console.error("Error obteniendo email:", data.error);
         return null;
@@ -92,14 +93,14 @@ const Dashboard = () => {
       className="dashboard p-6 min-h-screen"
       style={{
         backgroundImage: "url('/images/arco6.jpeg')",
-        backgroundRepeat: "repeat", // Mosaico
-        backgroundSize: "auto", // Ajuste automático del tamaño de la imagen
+        backgroundRepeat: "repeat",
+        backgroundSize: "auto",
       }}
     >
       <div className="flex flex-row justify-between">
-       <h1 className="text-4xl text-green-800 mb-4">
+        <h1 className="text-4xl text-green-800 mb-4">
           <strong>Bienvenido al Dashboard</strong>
-       </h1>
+        </h1>
 
         <Link href="https://three60training-jp4i.onrender.com/auth/salir">
           <button className="w-full p-4 bg-green-600 text-white font-bold rounded-md hover:bg-green-700 mb-6">
@@ -126,47 +127,25 @@ const Dashboard = () => {
 
         {user.tipo_usuario === "Deportista" && additionalInfo && (
           <>
-            <h3 className="text-lg font-semibold mt-4">
-              Información de Deportista
-            </h3>
-            <p>
-              <strong>Fecha de Nacimiento:</strong>{" "}
-              {additionalInfo.fecha_nacimiento}
-            </p>
-            <p>
-              <strong>Sexo:</strong> {additionalInfo.sexo}
-            </p>
-            <p>
-              <strong>Peso:</strong> {additionalInfo.peso} kg
-            </p>
-            <p>
-              <strong>Altura:</strong> {additionalInfo.altura} m
-            </p>
-            <p>
-              <strong>Nivel de Experiencia:</strong>{" "}
-              {additionalInfo.nivel_experiencia}
-            </p>
-            <p>
-              <strong>Deporte:</strong> {additionalInfo.id_deporte}
-            </p>
-            <p>
-              <strong>Entrenador:</strong>{" "}
-              {additionalInfo.nombre_entrenador || "No asignado"}
-            </p>
+            <h3 className="text-lg font-semibold mt-4">Información de Deportista</h3>
+            <p><strong>Fecha de Nacimiento:</strong> {additionalInfo.fecha_nacimiento}</p>
+            <p><strong>Sexo:</strong> {additionalInfo.sexo}</p>
+            <p><strong>Peso:</strong> {additionalInfo.peso} kg</p>
+            <p><strong>Altura:</strong> {additionalInfo.altura} m</p>
+            <p><strong>Nivel de Experiencia:</strong> {additionalInfo.nivel_experiencia}</p>
+            <p><strong>Deporte:</strong> {additionalInfo.id_deporte}</p>
+            <p><strong>Entrenador:</strong> {additionalInfo.nombre_entrenador || "No asignado"}</p>
           </>
         )}
 
         {user.tipo_usuario === "Entrenador" && additionalInfo && (
           <>
-            <h3 className="text-lg font-semibold mt-4">
-              Información de Entrenador
-            </h3>
-            <p>
-              <strong>Especialidad:</strong> {additionalInfo.especialidad}
-            </p>
+            <h3 className="text-lg font-semibold mt-4">Información de Entrenador</h3>
+            <p><strong>Especialidad:</strong> {additionalInfo.especialidad}</p>
           </>
         )}
       </div>
+
       <button
         onClick={navigateToProfile}
         className="p-4 bg-blue-600 text-white font-bold rounded-md mt-9 hover:bg-blue-700"
