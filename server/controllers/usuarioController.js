@@ -22,7 +22,7 @@ const getUsuarios = async (req, res, next) => {
 
 // Crear un nuevo usuario
 const createUsuario = async (req, res, next) => {
-  const { nombre, correo_electronico, contrasena, club, tipo_usuario } = req.body;
+  const { nombre, correo_electronico, contrasena, club, tipo_usuario, numero_documento } = req.body;
 
   try {
     //Crear un usuario en auth
@@ -37,8 +37,8 @@ const createUsuario = async (req, res, next) => {
 
     // Guardar usuario en la base de datos (Supabase)
     const result = await pool.query(
-      "INSERT INTO Usuarios (nombre, correo_electronico, tipo_usuario, club, id_auth0) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [nombre, correo_electronico, tipo_usuario, club, auth0Id]
+      "INSERT INTO Usuarios (nombre, correo_electronico, tipo_usuario, club, id_auth0, numero_documento) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+      [nombre, correo_electronico, tipo_usuario, club, auth0Id, numero_documento]
     );
 
     res.status(201).json(result.rows[0]);
@@ -50,12 +50,12 @@ const createUsuario = async (req, res, next) => {
 // Actualizar un usuario
 const updateUsuario = async (req, res, next) => {
   const { id } = req.params;
-  const { nombre, correo_electronico, contrasena, club, tipo_usuario } = req.body;
+  const { nombre, club, tipo_usuario, numero_documento } = req.body;
 
   try {
     const result = await pool.query(
-      "UPDATE usuarios SET nombre = $1, correo_electronico = $2, contrasena = $3, club = $4, tipo_usuario = $5 WHERE id_usuario = $6 RETURNING *",
-      [nombre, correo_electronico, contrasena, club, tipo_usuario, id]
+      "UPDATE usuarios SET nombre = $1, club = $2, tipo_usuario = $3, numero_documento = $4  WHERE id_usuario = $5 RETURNING *",
+      [nombre, club, tipo_usuario, numero_documento, id]
     );
 
     if (result.rows.length === 0) {

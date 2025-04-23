@@ -46,6 +46,7 @@ const Dashboard = () => {
       );
       const data = await response.json();
       if (response.ok) {
+<<<<<<< HEAD
         setUserData(data);
         localStorage.setItem("tipo_usuario", data.user.tipo_usuario);
         console.log("Tipo de usuario guardado en localStorage:", localStorage.getItem("tipo_usuario"));
@@ -60,6 +61,17 @@ const Dashboard = () => {
           localStorage.setItem("nombre_entrenador", data.user.nombre); // ✅
           console.log("id_entrenador guardado en localStorage:", localStorage.getItem("id_entrenador"));
           console.log("nombre_entrenador guardado en localStorage:", localStorage.getItem("nombre_entrenador"));
+=======
+        setUserData(data); // Guardar los datos del usuario
+
+        // Guardar en localStorage el id_deportista o id_entrenador (si aplica)
+        if (data.user.tipo_usuario === "Deportista" && data.additionalInfo?.id_deportista) {
+          localStorage.setItem("id_deportista", data.additionalInfo.id_deportista);
+          console.log("id_deportista guardado en localStorage:", localStorage.getItem("id_deportista"));
+        } else if (data.user.tipo_usuario === "Entrenador" && data.additionalInfo?.id_entrenador) {
+          localStorage.setItem("id_entrenador", data.additionalInfo.id_entrenador);
+          console.log("id_entrenador guardado en localStorage:", localStorage.getItem("id_entrenador"));
+>>>>>>> 0722773e439f2144888737f70fbe7fe2525b52d8
         }
       } else {
         console.error("Error obteniendo datos del usuario:", data.error);

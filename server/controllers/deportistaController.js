@@ -76,10 +76,59 @@ const deleteDeportista = async (req, res) => {
   }
 };
 
+// Obtener lista "extendida" de deportistas con JOIN en Usuarios
+// Opcionalmente filtrar por nombre (via ?search=...)
+const getAllDeportistasExtended = async (req, res) => {
+  const { search } = req.query;
+
+  try {
+    // Construimos la consulta base
+    let query = `
+      SELECT
+        d.id_deportista,
+        d.id_usuario,
+        u.nombre AS nombre_usuario,
+        u.numero_documento,
+        d.fecha_nacimiento,
+        d.sexo,
+        d.peso,
+        d.altura,
+        d.nivel_experiencia,
+        d.id_deporte,
+        d.id_entrenador
+      FROM Deportistas d
+      JOIN Usuarios u ON d.id_usuario = u.id_usuario
+    `;
+
+    const params = [];
+
+    // Si viene ?search=..., añadimos condición
+    // Usamos ILIKE (Postgres) para un filtrado case-insensitive
+    if (search) {
+      query += ` WHERE (u.nombre ILIKE $1 OR u.numero_documento ILIKE $1)`;
+      // El patrón '%' concatena para buscar parcial
+      params.push(`%${search}%`);
+    }
+
+    // Opcionalmente, ordenamos por nombre
+    query += ` ORDER BY u.nombre ASC`;
+
+    // Ejecutamos la consulta
+    const result = await pool.query(query, params);
+
+    res.status(200).json(result.rows);
+
+  } catch (error) {
+    console.error('Error obteniendo deportistas extendidos:', error.message);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+};
+
 module.exports = {
   getAllDeportistas,
   createDeportista,
   updateDeportista,
   getDeportistaById,
   deleteDeportista,
+  getAllDeportistasExtended,
 };

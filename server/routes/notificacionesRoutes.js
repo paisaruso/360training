@@ -6,6 +6,7 @@ const {
     deleteNotificacion,
     markAllAsRead,
     getUnreadNotificationsCount,
+    getUnreadNotificacionesByUsuario,
 } = require('../controllers/notificacionesController');
 
 const router = express.Router();
@@ -26,6 +27,9 @@ router.delete('/:id', deleteNotificacion);
 router.put('/usuario/:id_usuario', markAllAsRead);
 
 // Obtener numero de notificaciones sin leer
-router.get('/:id', getUnreadNotificationsCount);
+router.get('/unread/:id_usuario', getUnreadNotificationsCount);
+
+// Ruta para obtener solo las notificaciones no leídas
+router.get('/:id_usuario/unread', getUnreadNotificacionesByUsuario);
 
 module.exports = router;
