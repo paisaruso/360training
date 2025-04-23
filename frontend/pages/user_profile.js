@@ -15,12 +15,15 @@ const UserProfile = () => {
   const [seccion, setSeccion] = useState("generales");
 
   const router = useRouter();
-  const idDeportista = router.query.id;
 
   useEffect(() => {
+    if (!router.isReady) return;
+
     const cargarPerfil = async () => {
       const sid = localStorage.getItem("sid");
       const id_usuario = localStorage.getItem("id_usuario");
+      const idLocal = localStorage.getItem("id_deportista");
+      const idDeportista = router.query.id || idLocal;
 
       if (!sid || !id_usuario) {
         setError("Sesión inválida.");
@@ -43,6 +46,7 @@ const UserProfile = () => {
         const userInfo = await infoRes.json();
 
         setTipoUsuario(userInfo.user.tipo_usuario);
+
         if (userInfo.user.tipo_usuario === "Entrenador") {
           const id_entrenador = userInfo?.additionalInfo?.id_entrenador;
           if (!id_entrenador) throw new Error("No se pudo obtener el ID del entrenador.");
@@ -50,6 +54,7 @@ const UserProfile = () => {
         }
 
         if (idDeportista) {
+          console.log("🔁 Cargando datos del deportista con ID:", idDeportista);
           const res = await fetch(
             `https://three60training-jp4i.onrender.com/api/deportistas/${idDeportista}`
           );
@@ -57,6 +62,7 @@ const UserProfile = () => {
           const deportistaData = await res.json();
           setUserData(deportistaData);
         } else {
+          console.warn("⚠️ No se encontró ID para cargar perfil.");
           setUserData(userInfo);
         }
       } catch (err) {
@@ -68,15 +74,15 @@ const UserProfile = () => {
     };
 
     cargarPerfil();
-  }, [router.query.id]);
+  }, [router.isReady, router.query.id]);
 
-  const crearNotificacion = async () => {
+  const crearNotificacion = async (id) => {
     try {
       const notiRes = await fetch("http://localhost:5000/api/notificaciones", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id_usuario: parseInt(idDeportista),
+          id_usuario: parseInt(id),
           mensaje: "🔔 Tienes un nuevo comentario de tu entrenador.",
           tipo: "comentario",
         }),
@@ -93,6 +99,7 @@ const UserProfile = () => {
   };
 
   const guardarComentario = async () => {
+    const idDeportista = router.query.id || localStorage.getItem("id_deportista");
     if (!idDeportista || !comentario || !idEntrenador) return;
 
     const payload = {
@@ -113,8 +120,7 @@ const UserProfile = () => {
       alert("✅ Comentario guardado.");
       setComentario("");
 
-      // 👇 Crear la notificación después de guardar el comentario
-      await crearNotificacion();
+      await crearNotificacion(idDeportista);
     } catch (error) {
       alert("❌ No se pudo guardar el comentario.");
     }
@@ -123,6 +129,8 @@ const UserProfile = () => {
   if (loading) return <p className="text-center text-gray-500">Cargando perfil...</p>;
   if (error) return <p className="text-center text-red-600">{error}</p>;
   if (!userData) return <p className="text-center">No se encontraron datos.</p>;
+
+  const idFinal = router.query.id || localStorage.getItem("id_deportista");
 
   return (
     <div className="user-profile p-6 bg-gray-100 min-h-screen flex flex-col">
@@ -133,7 +141,7 @@ const UserProfile = () => {
           <p><strong>Correo:</strong> {userData.user?.correo_electronico || "No disponible"}</p>
         </div>
 
-        {tipoUsuario === "Entrenador" && idDeportista && (
+        {tipoUsuario === "Entrenador" && idFinal && (
           <div className="mt-6 bg-white p-4 rounded shadow-md">
             <h2 className="font-semibold text-black mb-2">Comentario General al Deportista</h2>
             <textarea
@@ -167,9 +175,9 @@ const UserProfile = () => {
         </div>
 
         <div className="mt-6">
-          {seccion === "generales" && <ComentariosGenerales idDeportista={idDeportista} />}
-          {seccion === "fisicos" && <ComentariosFisicos idDeportista={idDeportista} />}
-          {seccion === "especificos" && <ComentariosEspecificos idDeportista={idDeportista} />}
+          {seccion === "generales" && <ComentariosGenerales idDeportista={idFinal} />}
+          {seccion === "fisicos" && <ComentariosFisicos idDeportista={idFinal} />}
+          {seccion === "especificos" && <ComentariosEspecificos idDeportista={idFinal} />}
         </div>
 
         <div className="flex justify-center mt-10">
@@ -190,4 +198,3 @@ const UserProfile = () => {
 };
 
 export default UserProfile;
-

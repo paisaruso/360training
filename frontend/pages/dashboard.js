@@ -15,7 +15,7 @@ const Dashboard = () => {
     const sidFromQuery = queryParams.get("sid");
     if (sidFromQuery) {
       setSid(sidFromQuery);
-      localStorage.setItem("sid", sidFromQuery); // Guardar el SID en almacenamiento local
+      localStorage.setItem("sid", sidFromQuery);
     }
   }, []);
 
@@ -46,7 +46,6 @@ const Dashboard = () => {
       );
       const data = await response.json();
       if (response.ok) {
-<<<<<<< HEAD
         setUserData(data);
         localStorage.setItem("tipo_usuario", data.user.tipo_usuario);
         console.log("Tipo de usuario guardado en localStorage:", localStorage.getItem("tipo_usuario"));
@@ -55,23 +54,12 @@ const Dashboard = () => {
           localStorage.setItem("id_usuario", data.additionalInfo.id_deportista.toString());
           localStorage.setItem("id_deportista", data.additionalInfo.id_deportista.toString());
           console.log("id_deportista guardado en localStorage:", localStorage.getItem("id_deportista"));
-        } else if (data.user.tipo_usuario === "Entrenador") {
+        } else if (data.user.tipo_usuario === "Entrenador" && data.additionalInfo?.id_entrenador) {
           localStorage.setItem("id_usuario", data.user.id_usuario.toString());
-          localStorage.setItem("id_entrenador", data.additionalInfo.id_entrenador.toString()); // ✅ CORREGIDO
-          localStorage.setItem("nombre_entrenador", data.user.nombre); // ✅
+          localStorage.setItem("id_entrenador", data.additionalInfo.id_entrenador.toString());
+          localStorage.setItem("nombre_entrenador", data.user.nombre);
           console.log("id_entrenador guardado en localStorage:", localStorage.getItem("id_entrenador"));
           console.log("nombre_entrenador guardado en localStorage:", localStorage.getItem("nombre_entrenador"));
-=======
-        setUserData(data); // Guardar los datos del usuario
-
-        // Guardar en localStorage el id_deportista o id_entrenador (si aplica)
-        if (data.user.tipo_usuario === "Deportista" && data.additionalInfo?.id_deportista) {
-          localStorage.setItem("id_deportista", data.additionalInfo.id_deportista);
-          console.log("id_deportista guardado en localStorage:", localStorage.getItem("id_deportista"));
-        } else if (data.user.tipo_usuario === "Entrenador" && data.additionalInfo?.id_entrenador) {
-          localStorage.setItem("id_entrenador", data.additionalInfo.id_entrenador);
-          console.log("id_entrenador guardado en localStorage:", localStorage.getItem("id_entrenador"));
->>>>>>> 0722773e439f2144888737f70fbe7fe2525b52d8
         }
       } else {
         console.error("Error obteniendo datos del usuario:", data.error);
@@ -128,19 +116,10 @@ const Dashboard = () => {
 
       <div className="user-info p-4 bg-black bg-opacity-70 text-white rounded-lg shadow-md">
         <h2 className="text-2xl font-semibold mb-4">Datos del Usuario</h2>
-        <p>
-          <strong>Nombre:</strong> {user.nombre}
-        </p>
-        <p>
-          <strong>Correo Electrónico:</strong> {user.correo_electronico}
-        </p>
-        <p>
-          <strong>Tipo de Usuario:</strong> {user.tipo_usuario}
-        </p>
-        <p>
-          <strong>Fecha de Registro:</strong>{" "}
-          {new Date(user.fecha_registro).toLocaleString()}
-        </p>
+        <p><strong>Nombre:</strong> {user.nombre}</p>
+        <p><strong>Correo Electrónico:</strong> {user.correo_electronico}</p>
+        <p><strong>Tipo de Usuario:</strong> {user.tipo_usuario}</p>
+        <p><strong>Fecha de Registro:</strong> {new Date(user.fecha_registro).toLocaleString()}</p>
 
         {user.tipo_usuario === "Deportista" && additionalInfo && (
           <>
